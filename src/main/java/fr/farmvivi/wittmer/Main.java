@@ -206,7 +206,7 @@ public class Main {
 
     public static void verifAskType(Member member, TextChannel textChannel) {
         new OrderedMenu.Builder()
-                .setText("Cliquez sur l'emoji correspondant à votre statut")
+                .setText("Cliquez sur l'emoji correspondant à votre situation")
                 .setEventWaiter(eventWaiter)
                 .setTimeout(15, TimeUnit.DAYS)
                 .useNumbers()
@@ -226,7 +226,7 @@ public class Main {
 
     public static void verifAskLevel(Member member, TextChannel textChannel, Role role) {
         new OrderedMenu.Builder()
-                .setText("Cliquez sur l'emoji correspondant à votre statut")
+                .setText("Cliquez sur l'emoji correspondant à votre situation")
                 .setEventWaiter(eventWaiter)
                 .setTimeout(15, TimeUnit.DAYS)
                 .useNumbers()
@@ -250,7 +250,7 @@ public class Main {
     public static void verifAskClasse(Member member, TextChannel textChannel, Role role, Level level) {
         Map<Integer, ClasseBean> classes = new HashMap<>();
         OrderedMenu.Builder builder = new OrderedMenu.Builder()
-                .setText("Cliquez sur l'emoji correspondant à votre statut")
+                .setText("Cliquez sur l'emoji correspondant à votre situation")
                 .setEventWaiter(eventWaiter)
                 .setTimeout(15, TimeUnit.DAYS)
                 .useNumbers()
@@ -286,7 +286,7 @@ public class Main {
 
     public static void verifAskDeleguee(Member member, TextChannel textChannel, Role role, Level level, ClasseBean classe) {
         new OrderedMenu.Builder()
-                .setText("Cliquez sur l'emoji correspondant à votre statut")
+                .setText("Cliquez sur l'emoji correspondant à votre situation")
                 .setEventWaiter(eventWaiter)
                 .setTimeout(15, TimeUnit.DAYS)
                 .useNumbers()
@@ -305,21 +305,37 @@ public class Main {
     }
 
     public static void verifAskPrenom(Member member, TextChannel textChannel, Role role, Level level, ClasseBean classe, boolean delegue) {
-        Message message;
-        if (role.equals(Role.PROF))
-            message = textChannel.sendMessage("Mr ou Mme?").complete();
-        else
-            message = textChannel.sendMessage("Quel est votre prénom?").complete();
-        eventWaiter.waitForEvent(MessageReceivedEvent.class, e -> e.getAuthor().getIdLong() == member.getUser().getIdLong()
-                        && e.getChannel().getIdLong() == textChannel.getIdLong(),
-                e -> {
-                    //CONTINUE
-                    message.delete().queue();
-                    verifAskNom(member, textChannel, role, level, classe, delegue, e.getMessage().getContentRaw().toLowerCase());
-                    e.getMessage().delete().queue();
-                },
-                // if the user takes more than a minute, time out
-                15, TimeUnit.DAYS, () -> message.delete().queue());
+        if (role.equals(Role.PROF)) {
+            new OrderedMenu.Builder()
+                    .setText("Cliquez sur l'emoji correspondant à votre situation")
+                    .setEventWaiter(eventWaiter)
+                    .setTimeout(15, TimeUnit.DAYS)
+                    .useNumbers()
+                    .allowTextInput(true)
+                    .addChoices("Monsieur", "Madame")
+                    .setSelection((message, integer) -> {
+                        if (integer == 1) {
+                            //Mr
+                            verifAskNom(member, textChannel, role, level, classe, delegue, "Mr");
+                        } else if (integer == 2) {
+                            //Mme
+                            verifAskNom(member, textChannel, role, level, classe, delegue, "Mme");
+                        }
+                    })
+                    .build().display(textChannel);
+        } else {
+            Message message = textChannel.sendMessage("Quel est votre prénom?").complete();
+            eventWaiter.waitForEvent(MessageReceivedEvent.class, e -> e.getAuthor().getIdLong() == member.getUser().getIdLong()
+                            && e.getChannel().getIdLong() == textChannel.getIdLong(),
+                    e -> {
+                        //CONTINUE
+                        message.delete().queue();
+                        verifAskNom(member, textChannel, role, level, classe, delegue, e.getMessage().getContentRaw().toLowerCase());
+                        e.getMessage().delete().queue();
+                    },
+                    // if the user takes more than a minute, time out
+                    15, TimeUnit.DAYS, () -> message.delete().queue());
+        }
     }
 
     public static void verifAskNom(Member member, TextChannel textChannel, Role role, Level level, ClasseBean classe, boolean delegue, String prenom) {
