@@ -105,7 +105,10 @@ public class Main {
         logger.info("OK");
 
         jda.getPresence().setStatus(OnlineStatus.ONLINE);
-        jda.getPresence().setActivity(Activity.playing("Travailler..."));
+        if (production)
+            jda.getPresence().setActivity(Activity.playing("V" + version + " - PRODUCTION"));
+        else
+            jda.getPresence().setActivity(Activity.playing("V" + version + " - DEV"));
         logger.info(name + " (V" + version + ") (Prod: " + production + ") ready and started !");
 
         verif();
