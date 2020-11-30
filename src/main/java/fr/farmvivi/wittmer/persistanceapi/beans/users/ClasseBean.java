@@ -44,6 +44,13 @@ public class ClasseBean {
         this.discord_prof_id = discord_prof_id;
     }
 
+    @Override
+    public String toString() {
+        return "ClasseBean{" +
+                "id=" + id +
+                '}';
+    }
+
     public int getId() {
         return id;
     }

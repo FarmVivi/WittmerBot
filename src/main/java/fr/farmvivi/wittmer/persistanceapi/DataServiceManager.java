@@ -102,6 +102,16 @@ public class DataServiceManager {
         return this.classeManager.getClasseOfACategory(discord_id, this.databaseManager.getDatabaseAccess());
     }
 
+    public synchronized List<ClasseBean> getClasseOfAProf(long prof_id) throws Exception {
+        // Get classes of a prof
+        return this.classeManager.getClassesListOfAProf(prof_id, this.databaseManager.getDatabaseAccess());
+    }
+
+    public synchronized List<ClasseBean> getClasseOfAProf(long prof_id, Level level) throws Exception {
+        // Get classes of a prof
+        return this.classeManager.getClassesListOfAProf(prof_id, level, this.databaseManager.getDatabaseAccess());
+    }
+
     public synchronized List<ClasseBean> getClassesListOfALevel(Level level) throws Exception {
         // Get classes of a level
         return this.classeManager.getClassesListOfALevel(level, this.databaseManager.getDatabaseAccess());

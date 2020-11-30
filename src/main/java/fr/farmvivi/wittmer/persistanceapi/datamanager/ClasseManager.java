@@ -81,7 +81,7 @@ public class ClasseManager {
     // Get the classes for a user
     public List<ClasseBean> getUserClasses(UserBean user, DatabaseAccess databaseAccess) throws Exception {
         List<ClasseBean> classes = new ArrayList<>();
-        if (!user.getClasses().equals("0"))
+        if (!user.getClasses().equals("0") && !user.getClasses().isEmpty())
             for (String classeIdName : user.getClasses().split(";")) {
                 ClasseBean classeBean;
                 try {
@@ -167,6 +167,87 @@ public class ClasseManager {
                 // If there no dimension stats int the database
                 return null;
             }
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            throw exception;
+        } finally {
+            // Close the query environment in order to prevent leaks
+            close();
+        }
+    }
+
+    // Get classes list of a prof
+    public List<ClasseBean> getClassesListOfAProf(long prof_id, DatabaseAccess databaseAccess) throws Exception {
+        try {
+            // Set connection
+            connection = databaseAccess.getConnection();
+            List<ClasseBean> classesList = new ArrayList<>();
+
+            // Query construction
+            String sql = "select id, level, matiere_id, name, category_id, role_id, default_channel_id, prof_id";
+            sql += " from classes where prof_id = ?";
+
+            statement = connection.prepareStatement(sql);
+            statement.setLong(1, prof_id);
+
+            // Execute the query
+            resultset = statement.executeQuery();
+
+            // Manage the result in a list of bean
+            while (resultset.next()) {
+                int id = resultset.getInt("id");
+                short level = resultset.getShort("level");
+                int matiere_id = resultset.getInt("matiere_id");
+                String name = resultset.getString("name");
+                long category_id = resultset.getLong("category_id");
+                long role_id = resultset.getLong("role_id");
+                long default_channel_id = resultset.getLong("default_channel_id");
+                long PROF_ID = resultset.getLong("prof_id");
+                ClasseBean classeBean = new ClasseBean(id, Level.getById(level), Matiere.getById(matiere_id), name, category_id, role_id, default_channel_id, PROF_ID);
+                classesList.add(classeBean);
+            }
+            return classesList;
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            throw exception;
+        } finally {
+            // Close the query environment in order to prevent leaks
+            close();
+        }
+    }
+
+    // Get classes list of a prof
+    public List<ClasseBean> getClassesListOfAProf(long prof_id, Level level, DatabaseAccess databaseAccess) throws Exception {
+        try {
+            // Set connection
+            connection = databaseAccess.getConnection();
+            List<ClasseBean> classesList = new ArrayList<>();
+
+            // Query construction
+            String sql = "select id, level, matiere_id, name, category_id, role_id, default_channel_id, prof_id";
+            sql += " from classes where prof_id = ? and level = ?";
+
+            statement = connection.prepareStatement(sql);
+            statement.setLong(1, prof_id);
+            statement.setShort(2, level.getId());
+
+            // Execute the query
+            resultset = statement.executeQuery();
+
+            // Manage the result in a list of bean
+            while (resultset.next()) {
+                int id = resultset.getInt("id");
+                short LEVEL = resultset.getShort("level");
+                int matiere_id = resultset.getInt("matiere_id");
+                String name = resultset.getString("name");
+                long category_id = resultset.getLong("category_id");
+                long role_id = resultset.getLong("role_id");
+                long default_channel_id = resultset.getLong("default_channel_id");
+                long PROF_ID = resultset.getLong("prof_id");
+                ClasseBean classeBean = new ClasseBean(id, Level.getById(LEVEL), Matiere.getById(matiere_id), name, category_id, role_id, default_channel_id, PROF_ID);
+                classesList.add(classeBean);
+            }
+            return classesList;
         } catch (Exception exception) {
             exception.printStackTrace();
             throw exception;

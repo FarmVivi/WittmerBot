@@ -41,6 +41,13 @@ public class UserBean {
         this.verified = verified;
     }
 
+    @Override
+    public String toString() {
+        return "UserBean{" +
+                "discord_id=" + discord_id +
+                '}';
+    }
+
     public long getDiscord_id() {
         return discord_id;
     }

@@ -5,6 +5,7 @@ import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.jagrosh.jdautilities.menu.ButtonMenu;
 import com.jagrosh.jdautilities.menu.OrderedMenu;
+import com.jagrosh.jdautilities.menu.SelectionDialog;
 import fr.farmvivi.wittmer.command.*;
 import fr.farmvivi.wittmer.listener.JoinListener;
 import fr.farmvivi.wittmer.listener.RenameListener;
@@ -27,15 +28,15 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class Main {
-    public static final String version = "1.0.0.1";
+    public static final String version = "1.0.1.0";
     public static final String name = "Wittmer";
     public static final boolean production = false;
-    //public static final String _EMOTE = "";
     public static final String ANNULER_EMOTE = "\u274C";
     public static final String VALIDER_EMOTE = "\u2705";
     public static final long OWNER_ID = 177135083222859776L;
     public static final long GUILD_ID = 753631957606203474L;
     public static final long VERIF_CATEGORY_ID = 782655620586668102L;
+    public static final long COMMANDS_CATEGORY_ID = 782945519806316584L;
     public static final Logger logger = LoggerFactory.getLogger(name);
     private static final String TOKEN = "NzU0MDI5NjAxMDM0MDc2MTYw.X1uyyg.BhL4K5V9vvEUenmfTR31xrCt6IA";
     public static long DEMANDES_CHANNEL_ID;
@@ -104,14 +105,16 @@ public class Main {
         jda.addEventListener(commandClient, eventWaiter, new JoinListener(), new RenameListener());
         logger.info("OK");
 
+        logger.info("Processus de vérification des membres...");
+        verif();
+        logger.info("OK");
+
         jda.getPresence().setStatus(OnlineStatus.ONLINE);
         if (production)
             jda.getPresence().setActivity(Activity.playing("V" + version + " - PROD"));
         else
             jda.getPresence().setActivity(Activity.playing("V" + version + " - DEV"));
         logger.info(name + " (V" + version + ") (Prod: " + production + ") ready and started !");
-
-        verif();
     }
 
     public static void disable() {
@@ -132,12 +135,12 @@ public class Main {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void verif() {
         Guild guild = jda.getGuildById(GUILD_ID);
-        Category category = Objects.requireNonNull(guild).getCategoryById(VERIF_CATEGORY_ID);
-        for (GuildChannel guildChannel : Objects.requireNonNull(category).getChannels()) {
+        Category verifCategory = Objects.requireNonNull(guild).getCategoryById(VERIF_CATEGORY_ID);
+        for (GuildChannel guildChannel : Objects.requireNonNull(verifCategory).getChannels()) {
             logger.info("Delete " + guildChannel.getName() + " verif channel...");
             guildChannel.delete().queue();
         }
-        ChannelAction<TextChannel> channelAction1 = category.createTextChannel("\uD83C\uDD95 Demandes");
+        ChannelAction<TextChannel> channelAction1 = verifCategory.createTextChannel("\uD83C\uDD95 Demandes");
         List<Permission> channelAllow1 = new ArrayList<>();
         channelAllow1.add(Permission.MESSAGE_READ);
         channelAllow1.add(Permission.VOICE_CONNECT);
@@ -149,7 +152,7 @@ public class Main {
                 continue;
             if (member.getRoles().isEmpty()) {
                 logger.info("Create " + member.getUser().getName() + " verif channel...");
-                ChannelAction<TextChannel> channelAction = category.createTextChannel(member.getUser().getName());
+                ChannelAction<TextChannel> channelAction = verifCategory.createTextChannel(member.getUser().getName());
                 List<Permission> channelAllow = new ArrayList<>();
                 channelAllow.add(Permission.MESSAGE_READ);
                 channelAllow.add(Permission.VOICE_CONNECT);
@@ -177,13 +180,270 @@ public class Main {
                 }
             }
         }
-        for (Member member : guild.getMembers()) {
-            logger.info("Renaming " + member.getEffectiveName() + "...");
-            if (member.getEffectiveName().contains(" ("))
-                rename(member, member.getEffectiveName().split(" \\(")[0]);
-            else
-                rename(member, member.getEffectiveName());
+        Category commandsCategory = Objects.requireNonNull(guild).getCategoryById(COMMANDS_CATEGORY_ID);
+        for (GuildChannel guildChannel : Objects.requireNonNull(commandsCategory).getChannels()) {
+            logger.info("Delete " + guildChannel.getName() + " command channel...");
+            guildChannel.delete().queue();
         }
+        for (Member member : guild.getMembers()) {
+            if (!production && member.getIdLong() != OWNER_ID && member.getIdLong() != 751882667812847706L)
+                continue;
+            try {
+                if (!dataServiceManager.isUserCreated(member.getIdLong()))
+                    continue;
+                UserBean userBean = dataServiceManager.getUser(member.getIdLong(), new UserBean(member.getIdLong(), "", "", (short) 0, false, 0, "", false));
+                if (userBean.isVerified()) {
+                    logger.info("Renaming " + member.getEffectiveName() + "...");
+                    if (member.getEffectiveName().contains(" ("))
+                        rename(member, member.getEffectiveName().split(" \\(")[0]);
+                    else
+                        rename(member, member.getEffectiveName());
+                    logger.info("Sending commands to " + member.getEffectiveName() + "...");
+                    ChannelAction<TextChannel> channelAction = commandsCategory.createTextChannel(member.getUser().getName());
+                    List<Permission> channelAllow = new ArrayList<>();
+                    channelAllow.add(Permission.MESSAGE_READ);
+                    channelAllow.add(Permission.VOICE_CONNECT);
+                    channelAllow.add(Permission.MESSAGE_ADD_REACTION);
+                    channelAllow.add(Permission.MESSAGE_WRITE);
+                    channelAllow.add(Permission.MESSAGE_EXT_EMOJI);
+                    channelAllow.add(Permission.MESSAGE_HISTORY);
+                    channelAction.addMemberPermissionOverride(member.getIdLong(), channelAllow, new ArrayList<>());
+                    TextChannel textChannel = channelAction.complete();
+                    cmdStart(member, textChannel);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void cmdStart(Member member, TextChannel textChannel) {
+        try {
+            UserBean userBean = dataServiceManager.getUser(member.getIdLong(), new UserBean(member.getIdLong(), "", "", (short) 0, false, 0, "", false));
+            if (Objects.requireNonNull(Role.getById(userBean.getRole())).equals(Role.PROF)) {
+                new OrderedMenu.Builder()
+                        .setText("Cliquez sur l'emoji correspondant à ce que vous voulez faire")
+                        .setEventWaiter(eventWaiter)
+                        .setTimeout(30, TimeUnit.DAYS)
+                        .useNumbers()
+                        .allowTextInput(true)
+                        .addChoices("Créer un salon vocal de cours")
+                        .setSelection((message, integer) -> {
+                            if (integer == 1) {
+                                //CREATE VOCAL
+                                cmdProfAskCreateChannel(member, textChannel);
+                            }
+                        })
+                        .build().display(textChannel);
+            } else {
+                new OrderedMenu.Builder()
+                        .setText("Cliquez sur l'emoji correspondant à ce que vous voulez faire")
+                        .setEventWaiter(eventWaiter)
+                        .setTimeout(30, TimeUnit.DAYS)
+                        .useNumbers()
+                        .allowTextInput(true)
+                        .addChoices("Rejoindre une classe")
+                        .setSelection((message, integer) -> {
+                            if (integer == 1) {
+                                //JOIN CLASS
+                                cmdEleveAskJoinClasse(member, textChannel, userBean);
+                            }
+                        })
+                        .build().display(textChannel);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void cmdEleveAskJoinClasse(Member member, TextChannel textChannel, UserBean userBean) {
+        Map<Integer, Matiere> matieres = new HashMap<>();
+        SelectionDialog.Builder builder = new SelectionDialog.Builder()
+                .setText("Naviguez parmi ce menu pour choisir la matière que vous voulez rejoindre")
+                .setEventWaiter(eventWaiter)
+                .setTimeout(30, TimeUnit.DAYS)
+                .setSelectedEnds(">**", "**<")
+                .useSingleSelectionMode(true)
+                .useLooping(true)
+                .setSelectionConsumer((message, integer) -> {
+                    //CONTINUE
+                    if (integer == 0) {
+                        cmdStart(member, textChannel);
+                    } else
+                        cmdEleveAskJoinClasseMatiere(member, textChannel, userBean, matieres.get(integer));
+                    message.delete().queue();
+                })
+                .setCanceled(message -> {
+                    message.delete().queue();
+                    cmdStart(member, textChannel);
+                });
+        int i = 0;
+        try {
+            List<Matiere> matieresTemp = getJoinableMatieres(userBean);
+            if (matieresTemp.isEmpty()) {
+                textChannel.sendMessage(commandClient.getError() + " Vous ne pouvez pas rejoindre d'autres classes")
+                        .delay(10, TimeUnit.SECONDS)
+                        .flatMap(message -> {
+                            message.delete().queue();
+                            cmdStart(member, textChannel);
+                            return null;
+                        }).queue();
+                return;
+            } else {
+                for (Matiere matiere : matieresTemp) {
+                    if (matiere.equals(Matiere.AUCUNE))
+                        continue;
+                    i++;
+                    builder.addChoices(matiere.getName());
+                    matieres.put(i, matiere);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        builder.build().display(textChannel);
+    }
+
+    public static void cmdEleveAskJoinClasseMatiere(Member member, TextChannel textChannel, UserBean userBean, Matiere matiere) {
+        Map<Integer, ClasseBean> classes = new HashMap<>();
+        OrderedMenu.Builder builder = new OrderedMenu.Builder()
+                .setText("Cliquez sur la classe que vous voulez rejoindre")
+                .setEventWaiter(eventWaiter)
+                .setTimeout(30, TimeUnit.DAYS)
+                .useNumbers()
+                .allowTextInput(true)
+                .setSelection((message, integer) -> {
+                    //CONTINUE
+                    Main.joinClasse(member, classes.get(integer));
+                    cmdStart(member, textChannel);
+                });
+        int i = 0;
+        List<ClasseBean> finalClasses = getJoinableClasses(userBean, matiere);
+        if (finalClasses.isEmpty()) {
+            textChannel.sendMessage(commandClient.getError() + " ERREUR: Vous ne pouvez rejoindre aucune classe de la matière " + matiere.getName())
+                    .delay(10, TimeUnit.SECONDS)
+                    .flatMap(message -> {
+                        message.delete().queue();
+                        cmdStart(member, textChannel);
+                        return null;
+                    }).queue();
+            return;
+        } else {
+            for (ClasseBean classeBean : finalClasses) {
+                i++;
+                builder.addChoice(classeBean.getName());
+                classes.put(i, classeBean);
+            }
+        }
+        builder.build().display(textChannel);
+    }
+
+    private static List<Matiere> getJoinableMatieres(UserBean userBean) {
+        List<Matiere> matieres = new ArrayList<>();
+        for (Matiere matiere : Matiere.values()) {
+            if (!getJoinableClasses(userBean, matiere).isEmpty())
+                matieres.add(matiere);
+        }
+        return matieres;
+    }
+
+    private static List<ClasseBean> getJoinableClasses(UserBean userBean, Matiere matiere) {
+        List<ClasseBean> finalClasses = new ArrayList<>();
+        try {
+            ClasseBean defaultClasse = dataServiceManager.getUserDefaultClasse(userBean);
+            List<ClasseBean> alreadyJoinedClasses = dataServiceManager.getUserClasses(userBean);
+            List<ClasseBean> availableClasses = dataServiceManager.getClassesListOfALevelAndMatiere(defaultClasse.getLevel(), matiere);
+            for (ClasseBean availableClasse : availableClasses) {
+                boolean add = true;
+                if (availableClasse.getMatiere().isEntireClasse() && !availableClasse.getName().contains(defaultClasse.getName().split("⌋ ")[1]))
+                    add = false;
+                for (ClasseBean alreadyJoinedClasse : alreadyJoinedClasses) {
+                    if (availableClasse.getId() == alreadyJoinedClasse.getId()) {
+                        add = false;
+                        break;
+                    }
+                }
+                if (add)
+                    finalClasses.add(availableClasse);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return finalClasses;
+    }
+
+    public static void cmdProfAskCreateChannel(Member member, TextChannel textChannel) {
+        new OrderedMenu.Builder()
+                .setText("Quel est le niveau concerné?")
+                .setEventWaiter(eventWaiter)
+                .setTimeout(30, TimeUnit.DAYS)
+                .useNumbers()
+                .allowTextInput(true)
+                .addChoices("Seconde", "Première", "Terminale")
+                .setSelection((message, integer) -> {
+                    if (integer == 1) {
+                        //Seconde
+                        cmdProfAskCreateChannelLevel(member, textChannel, Level.SECONDE);
+                    } else if (integer == 2) {
+                        //Première
+                        cmdProfAskCreateChannelLevel(member, textChannel, Level.PREMIERE);
+                    } else if (integer == 3) {
+                        //Terminale
+                        cmdProfAskCreateChannelLevel(member, textChannel, Level.TERMINALE);
+                    }
+                })
+                .build().display(textChannel);
+    }
+
+    @SuppressWarnings({"ResultOfMethodCallIgnored", "MismatchedQueryAndUpdateOfCollection"})
+    public static void cmdProfAskCreateChannelLevel(Member member, TextChannel textChannel, Level level) {
+        Map<Integer, ClasseBean> classes = new HashMap<>();
+        OrderedMenu.Builder builder = new OrderedMenu.Builder()
+                .setText("Quelle est la classe concernée?")
+                .setEventWaiter(eventWaiter)
+                .setTimeout(30, TimeUnit.DAYS)
+                .useNumbers()
+                .allowTextInput(true)
+                .setSelection((message, integer) -> {
+                    //CONTINUE
+                    Guild guild = jda.getGuildById(GUILD_ID);
+                    Category category = Objects.requireNonNull(guild).getCategoryById(classes.get(integer).getDiscord_category_id());
+                    ChannelAction<VoiceChannel> channelAction = Objects.requireNonNull(category).createVoiceChannel("Cours");
+                    List<Permission> channelAllow = new ArrayList<>();
+                    channelAllow.add(Permission.MESSAGE_READ);
+                    channelAllow.add(Permission.VOICE_CONNECT);
+                    channelAction.addMemberPermissionOverride(member.getIdLong(), channelAllow, new ArrayList<>());
+                    channelAction.setUserlimit(99);
+                    channelAction.queue();
+                    textChannel.sendMessage(new EmbedBuilder().setDescription("Salon crée !").setColor(Color.GREEN).build()).delay(5, TimeUnit.SECONDS).flatMap(message1 -> {
+                        message1.delete().queue();
+                        cmdStart(member, textChannel);
+                        return null;
+                    }).queue();
+                });
+        int i = 0;
+        try {
+            List<ClasseBean> classeBeans = dataServiceManager.getClasseOfAProf(member.getIdLong(), level);
+            if (classeBeans.isEmpty()) {
+                textChannel.sendMessage(commandClient.getError() + " ERREUR: Aucune classe d'enregistré en " + level.getName())
+                        .delay(10, TimeUnit.SECONDS)
+                        .flatMap(message -> {
+                            message.delete().queue();
+                            cmdStart(member, textChannel);
+                            return null;
+                        }).queue();
+                return;
+            } else {
+                for (ClasseBean classeBean : classeBeans) {
+                    i++;
+                    builder.addChoice(classeBean.getName());
+                    classes.put(i, classeBean);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        builder.build().display(textChannel);
     }
 
     public static void verifAskStart(Member member, TextChannel textChannel) {
@@ -195,7 +455,7 @@ public class Main {
                         "Maintenant cliquez sur l'emoji :white_check_mark: juste en dessous de ce message.")
                 .setChoices(VALIDER_EMOTE)
                 .setEventWaiter(eventWaiter)
-                .setTimeout(15, TimeUnit.DAYS)
+                .setTimeout(30, TimeUnit.DAYS)
                 .setAction(re -> {
                     if (re.getName().equals(VALIDER_EMOTE)) {
                         //CONTINUE
@@ -210,7 +470,7 @@ public class Main {
         new OrderedMenu.Builder()
                 .setText("Cliquez sur l'emoji correspondant à votre situation")
                 .setEventWaiter(eventWaiter)
-                .setTimeout(15, TimeUnit.DAYS)
+                .setTimeout(30, TimeUnit.DAYS)
                 .useNumbers()
                 .allowTextInput(true)
                 .addChoices("Élève", "Professeur")
@@ -230,7 +490,7 @@ public class Main {
         new OrderedMenu.Builder()
                 .setText("Cliquez sur l'emoji correspondant à votre situation")
                 .setEventWaiter(eventWaiter)
-                .setTimeout(15, TimeUnit.DAYS)
+                .setTimeout(30, TimeUnit.DAYS)
                 .useNumbers()
                 .allowTextInput(true)
                 .addChoices("Seconde", "Première", "Terminale")
@@ -254,7 +514,7 @@ public class Main {
         OrderedMenu.Builder builder = new OrderedMenu.Builder()
                 .setText("Cliquez sur l'emoji correspondant à votre situation")
                 .setEventWaiter(eventWaiter)
-                .setTimeout(15, TimeUnit.DAYS)
+                .setTimeout(30, TimeUnit.DAYS)
                 .useNumbers()
                 .allowTextInput(true)
                 .setSelection((message, integer) -> {
@@ -290,7 +550,7 @@ public class Main {
         new OrderedMenu.Builder()
                 .setText("Cliquez sur l'emoji correspondant à votre situation")
                 .setEventWaiter(eventWaiter)
-                .setTimeout(15, TimeUnit.DAYS)
+                .setTimeout(30, TimeUnit.DAYS)
                 .useNumbers()
                 .allowTextInput(true)
                 .addChoices("Délégué•e", "Pas délégué•e")
@@ -311,7 +571,7 @@ public class Main {
             new OrderedMenu.Builder()
                     .setText("Cliquez sur l'emoji correspondant à votre situation")
                     .setEventWaiter(eventWaiter)
-                    .setTimeout(15, TimeUnit.DAYS)
+                    .setTimeout(30, TimeUnit.DAYS)
                     .useNumbers()
                     .allowTextInput(true)
                     .addChoices("Monsieur", "Madame")
@@ -336,7 +596,7 @@ public class Main {
                         e.getMessage().delete().queue();
                     },
                     // if the user takes more than a minute, time out
-                    15, TimeUnit.DAYS, () -> message.delete().queue());
+                    30, TimeUnit.DAYS, () -> message.delete().queue());
         }
     }
 
@@ -359,9 +619,10 @@ public class Main {
                     e.getMessage().delete().queue();
                 },
                 // if the user takes more than a minute, time out
-                15, TimeUnit.DAYS, () -> message.delete().queue());
+                30, TimeUnit.DAYS, () -> message.delete().queue());
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void verifFinal(Member member, TextChannel textChannel, Role role, Level level, ClasseBean classe, boolean delegue, String prenom, String nom) {
         Message messageVerif = textChannel.sendMessage(new EmbedBuilder().setDescription("Demande en attende de vérification...").setColor(Color.GREEN).build()).complete();
         StringBuilder text = new StringBuilder("<@" + member.getIdLong() + ">, " + prenom + " " + nom +
@@ -375,7 +636,7 @@ public class Main {
                 .setText(text.toString())
                 .setChoices(VALIDER_EMOTE, ANNULER_EMOTE)
                 .setEventWaiter(eventWaiter)
-                .setTimeout(15, TimeUnit.DAYS)
+                .setTimeout(30, TimeUnit.DAYS)
                 .setAction(re -> {
                     if (re.getName().equals(VALIDER_EMOTE)) {
                         //ACCEPT
@@ -390,6 +651,19 @@ public class Main {
                             messageVerif.getTextChannel().delete().queue();
                             dataServiceManager.updateUser(userBean);
                             rename(member, member.getEffectiveName());
+                            Guild guild = jda.getGuildById(GUILD_ID);
+                            Category commandsCategory = Objects.requireNonNull(guild).getCategoryById(COMMANDS_CATEGORY_ID);
+                            ChannelAction<TextChannel> channelAction = Objects.requireNonNull(commandsCategory).createTextChannel(member.getUser().getName());
+                            List<Permission> channelAllow = new ArrayList<>();
+                            channelAllow.add(Permission.MESSAGE_READ);
+                            channelAllow.add(Permission.VOICE_CONNECT);
+                            channelAllow.add(Permission.MESSAGE_ADD_REACTION);
+                            channelAllow.add(Permission.MESSAGE_WRITE);
+                            channelAllow.add(Permission.MESSAGE_EXT_EMOJI);
+                            channelAllow.add(Permission.MESSAGE_HISTORY);
+                            channelAction.addMemberPermissionOverride(member.getIdLong(), channelAllow, new ArrayList<>());
+                            TextChannel cmdChannel = channelAction.complete();
+                            cmdStart(member, cmdChannel);
                             logger.info("Accepted " + member.getEffectiveName());
                         } catch (Exception e) {
                             e.printStackTrace();
