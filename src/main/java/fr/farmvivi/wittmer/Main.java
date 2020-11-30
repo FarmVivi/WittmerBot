@@ -145,6 +145,8 @@ public class Main {
         logger.info("Create \uD83C\uDD95 Demandes verif channel...");
         DEMANDES_CHANNEL_ID = channelAction1.complete().getIdLong();
         for (Member member : guild.getMembers()) {
+            if (!production && member.getIdLong() != OWNER_ID && member.getIdLong() != 751882667812847706L)
+                continue;
             if (member.getRoles().isEmpty()) {
                 logger.info("Create " + member.getUser().getName() + " verif channel...");
                 ChannelAction<TextChannel> channelAction = category.createTextChannel(member.getUser().getName());
