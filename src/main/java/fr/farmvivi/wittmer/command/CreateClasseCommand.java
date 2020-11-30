@@ -68,10 +68,11 @@ public class CreateClasseCommand extends Command {
                 net.dv8tion.jda.api.entities.Category category = categoryAction.complete();
                 TextChannel textChannel = category.createTextChannel("discussion").complete();
                 try {
-                    ClasseBean classeBean = new ClasseBean(0, level, matiere, name.toString(), category.getIdLong(), role.getIdLong(), textChannel.getIdLong(), prof_id);
-                    Main.dataServiceManager.createClasse(classeBean);
-                    if (prof_id != 0L)
+                    Main.dataServiceManager.createClasse(new ClasseBean(0, level, matiere, name.toString(), category.getIdLong(), role.getIdLong(), textChannel.getIdLong(), prof_id));
+                    if (prof_id != 0L) {
+                        ClasseBean classeBean = Main.dataServiceManager.getClasseOfACategory(category.getIdLong());
                         Main.joinClasse(Objects.requireNonNull(Main.jda.getGuildById(Main.GUILD_ID)).getMemberById(classeBean.getDiscord_prof_id()), classeBean);
+                    }
                     event.replySuccess("Succès");
                 } catch (Exception e) {
                     e.printStackTrace();

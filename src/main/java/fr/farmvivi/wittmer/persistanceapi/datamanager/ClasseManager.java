@@ -136,6 +136,46 @@ public class ClasseManager {
         return classes;
     }
 
+    // Get classe of category
+    public ClasseBean getClasseOfACategory(long category_id, DatabaseAccess databaseAccess) throws Exception {
+        try {
+            // Set connection
+            connection = databaseAccess.getConnection();
+
+            // Query construction
+            String sql = "select id, level, matiere_id, name, category_id, role_id, default_channel_id, prof_id from classes where category_id = ?";
+
+            statement = connection.prepareStatement(sql);
+            statement.setLong(1, category_id);
+
+            // Execute the query
+            resultset = statement.executeQuery();
+
+            // Manage the result in a bean
+            if (resultset.next()) {
+                // There's a result
+                int id = resultset.getInt("id");
+                short level = resultset.getShort("level");
+                int matiere_id = resultset.getInt("matiere_id");
+                String name = resultset.getString("name");
+                long CATEGORY_ID = resultset.getLong("category_id");
+                long role_id = resultset.getLong("role_id");
+                long default_channel_id = resultset.getLong("default_channel_id");
+                long prof_id = resultset.getLong("prof_id");
+                return new ClasseBean(id, Level.getById(level), Matiere.getById(matiere_id), name, CATEGORY_ID, role_id, default_channel_id, prof_id);
+            } else {
+                // If there no dimension stats int the database
+                return null;
+            }
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            throw exception;
+        } finally {
+            // Close the query environment in order to prevent leaks
+            close();
+        }
+    }
+
     // Get classes list
     public List<ClasseBean> getClassesListOfALevel(Level level, DatabaseAccess databaseAccess) throws Exception {
         try {
