@@ -26,18 +26,22 @@ public class ClasseBean {
     private String name;
     private long discord_category_id;
     private long discord_role_id;
+    private long discord_default_channel_id;
+    private long discord_prof_id;
 
     public ClasseBean() {
         super();
     }
 
-    public ClasseBean(int id, Level level, Matiere matiere, String name, long discord_category_id, long discord_role_id) {
+    public ClasseBean(int id, Level level, Matiere matiere, String name, long discord_category_id, long discord_role_id, long discord_default_channel_id, long discord_prof_id) {
         this.id = id;
         this.level = level;
         this.matiere = matiere;
         this.name = name;
         this.discord_category_id = discord_category_id;
         this.discord_role_id = discord_role_id;
+        this.discord_default_channel_id = discord_default_channel_id;
+        this.discord_prof_id = discord_prof_id;
     }
 
     public int getId() {
@@ -86,5 +90,21 @@ public class ClasseBean {
 
     public void setDiscord_role_id(long discord_role_id) {
         this.discord_role_id = discord_role_id;
+    }
+
+    public long getDiscord_default_channel_id() {
+        return discord_default_channel_id;
+    }
+
+    public void setDiscord_default_channel_id(long discord_default_channel_id) {
+        this.discord_default_channel_id = discord_default_channel_id;
+    }
+
+    public long getDiscord_prof_id() {
+        return discord_prof_id;
+    }
+
+    public void setDiscord_prof_id(long discord_prof_id) {
+        this.discord_prof_id = discord_prof_id;
     }
 }

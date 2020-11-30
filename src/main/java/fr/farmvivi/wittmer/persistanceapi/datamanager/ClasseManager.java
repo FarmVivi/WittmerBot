@@ -44,7 +44,7 @@ public class ClasseManager {
             connection = databaseAccess.getConnection();
 
             // Query construction
-            String sql = "select id, level, matiere_id, name, category_id, role_id from classes where id = ?";
+            String sql = "select id, level, matiere_id, name, category_id, role_id, default_channel_id, prof_id from classes where id = ?";
 
             statement = connection.prepareStatement(sql);
             statement.setInt(1, user.getDefault_classe());
@@ -61,7 +61,9 @@ public class ClasseManager {
                 String name = resultset.getString("name");
                 long category_id = resultset.getLong("category_id");
                 long role_id = resultset.getLong("role_id");
-                classeBean = new ClasseBean(id, Level.getById(level), Matiere.getById(matiere_id), name, category_id, role_id);
+                long default_channel_id = resultset.getLong("default_channel_id");
+                long prof_id = resultset.getLong("prof_id");
+                classeBean = new ClasseBean(id, Level.getById(level), Matiere.getById(matiere_id), name, category_id, role_id, default_channel_id, prof_id);
             } else {
                 // If there no dimension stats int the database
                 return null;
@@ -87,7 +89,7 @@ public class ClasseManager {
                     connection = databaseAccess.getConnection();
 
                     // Query construction
-                    String sql = "select id, level, matiere_id, name, category_id, role_id from classes where id = ?";
+                    String sql = "select id, level, matiere_id, name, category_id, role_id, default_channel_id, prof_id from classes where id = ?";
 
                     statement = connection.prepareStatement(sql);
                     statement.setInt(1, Integer.parseInt(classeIdName));
@@ -104,7 +106,9 @@ public class ClasseManager {
                         String name = resultset.getString("name");
                         long category_id = resultset.getLong("category_id");
                         long role_id = resultset.getLong("role_id");
-                        classeBean = new ClasseBean(id, Level.getById(level), Matiere.getById(matiere_id), name, category_id, role_id);
+                        long default_channel_id = resultset.getLong("default_channel_id");
+                        long prof_id = resultset.getLong("prof_id");
+                        classeBean = new ClasseBean(id, Level.getById(level), Matiere.getById(matiere_id), name, category_id, role_id, default_channel_id, prof_id);
                     } else {
                         // If there no dimension stats int the database
                         return null;
@@ -140,7 +144,7 @@ public class ClasseManager {
             List<ClasseBean> classesList = new ArrayList<>();
 
             // Query construction
-            String sql = "select id, level, matiere_id, name, category_id, role_id";
+            String sql = "select id, level, matiere_id, name, category_id, role_id, default_channel_id, prof_id";
             sql += " from classes where level = ?";
 
             statement = connection.prepareStatement(sql);
@@ -157,7 +161,9 @@ public class ClasseManager {
                 String name = resultset.getString("name");
                 long category_id = resultset.getLong("category_id");
                 long role_id = resultset.getLong("role_id");
-                ClasseBean classeBean = new ClasseBean(id, Level.getById(LEVEL), Matiere.getById(matiere_id), name, category_id, role_id);
+                long default_channel_id = resultset.getLong("default_channel_id");
+                long prof_id = resultset.getLong("prof_id");
+                ClasseBean classeBean = new ClasseBean(id, Level.getById(LEVEL), Matiere.getById(matiere_id), name, category_id, role_id, default_channel_id, prof_id);
                 classesList.add(classeBean);
             }
             return classesList;
@@ -178,7 +184,7 @@ public class ClasseManager {
             List<ClasseBean> classesList = new ArrayList<>();
 
             // Query construction
-            String sql = "select id, level, matiere_id, name, category_id, role_id";
+            String sql = "select id, level, matiere_id, name, category_id, role_id, default_channel_id, prof_id";
             sql += " from classes where level = ? and matiere_id = ?";
 
             statement = connection.prepareStatement(sql);
@@ -196,7 +202,9 @@ public class ClasseManager {
                 String name = resultset.getString("name");
                 long category_id = resultset.getLong("category_id");
                 long role_id = resultset.getLong("role_id");
-                ClasseBean classeBean = new ClasseBean(id, Level.getById(LEVEL), Matiere.getById(matiere_id), name, category_id, role_id);
+                long default_channel_id = resultset.getLong("default_channel_id");
+                long prof_id = resultset.getLong("prof_id");
+                ClasseBean classeBean = new ClasseBean(id, Level.getById(LEVEL), Matiere.getById(matiere_id), name, category_id, role_id, default_channel_id, prof_id);
                 classesList.add(classeBean);
             }
             return classesList;
@@ -217,8 +225,8 @@ public class ClasseManager {
             connection = databaseAccess.getConnection();
 
             // Query construction
-            String sql = "insert into classes (level, matiere_id, name, category_id, role_id)";
-            sql += " values (?, ?, ?, ?, ?)";
+            String sql = "insert into classes (level, matiere_id, name, category_id, role_id, default_channel_id, prof_id)";
+            sql += " values (?, ?, ?, ?, ?, ?, ?)";
 
             statement = connection.prepareStatement(sql);
             statement.setShort(1, classe.getLevel().getId());
@@ -226,6 +234,8 @@ public class ClasseManager {
             statement.setString(3, classe.getName());
             statement.setLong(4, classe.getDiscord_category_id());
             statement.setLong(5, classe.getDiscord_role_id());
+            statement.setLong(6, classe.getDiscord_default_channel_id());
+            statement.setLong(7, classe.getDiscord_prof_id());
 
             // Execute the query
             statement.executeUpdate();

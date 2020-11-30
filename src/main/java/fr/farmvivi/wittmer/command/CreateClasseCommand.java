@@ -9,6 +9,7 @@ import fr.farmvivi.wittmer.persistanceapi.beans.users.ClasseBean;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.requests.restaction.RoleAction;
 
@@ -20,7 +21,7 @@ public class CreateClasseCommand extends Command {
     public CreateClasseCommand() {
         this.name = "createclasse";
         this.help = "Créer une classe";
-        this.arguments = "<level> <matiere> <numéro de classe>";
+        this.arguments = "<level> <matiere> <numéro de classe> <prof id>";
         this.guildOnly = true;
         this.ownerCommand = true;
     }
@@ -33,13 +34,14 @@ public class CreateClasseCommand extends Command {
         } else {
             String[] args = event.getArgs().split("\\s+");
 
-            if (args.length < 3) {
+            if (args.length < 4) {
                 event.replyWarning("Erreur arguments");
             } else {
                 Level level = Level.getById(Short.parseShort(args[0]));
                 Matiere matiere = Matiere.getById(Integer.parseInt(args[1]));
                 int num = Integer.parseInt(args[2]);
-                StringBuilder name = new StringBuilder(Objects.requireNonNull(level).getPrefix());
+                long prof_id = Long.parseLong(args[3]);
+                StringBuilder name = new StringBuilder("⌈" + Objects.requireNonNull(matiere).getEmoji() + "⌋ " + Objects.requireNonNull(level).getPrefix());
                 if (Objects.requireNonNull(matiere).getName().isEmpty()) {
                     name.append(num);
                 } else if (matiere.isEntireClasse()) {
@@ -64,14 +66,17 @@ public class CreateClasseCommand extends Command {
                 categoryDeny.add(Permission.VOICE_CONNECT);
                 categoryAction.addRolePermissionOverride(guild.getPublicRole().getIdLong(), new ArrayList<>(), categoryDeny);
                 net.dv8tion.jda.api.entities.Category category = categoryAction.complete();
+                TextChannel textChannel = category.createTextChannel("discussion").complete();
                 try {
-                    Main.dataServiceManager.createClasse(new ClasseBean(0, level, matiere, name.toString(), category.getIdLong(), role.getIdLong()));
+                    ClasseBean classeBean = new ClasseBean(0, level, matiere, name.toString(), category.getIdLong(), role.getIdLong(), textChannel.getIdLong(), prof_id);
+                    Main.dataServiceManager.createClasse(classeBean);
+                    if (prof_id != 0L)
+                        Main.joinClasse(Objects.requireNonNull(Main.jda.getGuildById(Main.GUILD_ID)).getMemberById(classeBean.getDiscord_prof_id()), classeBean);
                     event.replySuccess("Succès");
                 } catch (Exception e) {
                     e.printStackTrace();
                     event.replyError("Erreur bdd");
                 }
-                category.createTextChannel("discussion").queue();
             }
         }
         event.getMessage().delete().queue();

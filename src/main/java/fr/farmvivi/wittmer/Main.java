@@ -386,7 +386,7 @@ public class Main {
                                 Objects.requireNonNull(jda.getGuildById(GUILD_ID)).addRoleToMember(member, Objects.requireNonNull(jda.getRoleById(Role.DELEGUE.getRoleId()))).queue();
                             Objects.requireNonNull(jda.getGuildById(GUILD_ID)).addRoleToMember(member, Objects.requireNonNull(jda.getRoleById(Objects.requireNonNull(Role.getById(userBean.getRole())).getRoleId()))).queue();
                             if (classe != null)
-                                Objects.requireNonNull(jda.getGuildById(GUILD_ID)).addRoleToMember(member, Objects.requireNonNull(jda.getRoleById(Objects.requireNonNull(classe).getDiscord_role_id()))).queue();
+                                joinClasse(member, classe);
                             messageVerif.getTextChannel().delete().queue();
                             dataServiceManager.updateUser(userBean);
                             rename(member, member.getEffectiveName());
@@ -408,6 +408,27 @@ public class Main {
                 })
                 .setFinalAction(message -> message.delete().queue())
                 .build().display(jda.getTextChannelById(DEMANDES_CHANNEL_ID));
+    }
+
+    public static void joinClasse(Member member, ClasseBean classeBean) {
+        try {
+            UserBean userBean = dataServiceManager.getUser(member.getIdLong(), new UserBean(member.getIdLong(), "", "", (short) 0, false, 0, "", false));
+            Objects.requireNonNull(jda.getGuildById(GUILD_ID)).addRoleToMember(member, Objects.requireNonNull(jda.getRoleById(Objects.requireNonNull(classeBean).getDiscord_role_id()))).queue();
+            @SuppressWarnings("StringBufferReplaceableByString") StringBuilder pseudo = new StringBuilder();
+            pseudo.append(userBean.getPrenom().toUpperCase(), 0, 1)
+                    .append(userBean.getPrenom(), 1, userBean.getPrenom().length());
+            pseudo.append(" ");
+            pseudo.append(userBean.getNom().toUpperCase());
+            TextChannel defaultChannel = jda.getTextChannelById(classeBean.getDiscord_default_channel_id());
+            if (userBean.getClasses().length() == 0)
+                userBean.setClasses(classeBean.getId() + "");
+            else
+                userBean.setClasses(userBean.getClasses() + ";" + classeBean.getId());
+            dataServiceManager.updateUser(userBean);
+            Objects.requireNonNull(defaultChannel).sendMessage(new EmbedBuilder().setDescription(pseudo.toString() + " a rejoint la classe !").setColor(Color.GREEN).build()).queue();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
