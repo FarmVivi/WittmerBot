@@ -94,6 +94,7 @@ public class Main {
         logger.info("Initialisation des commandes...");
         CommandClientBuilder commandClientBuilder = new CommandClientBuilder();
         commandClientBuilder.setOwnerId(OWNER_ID + "");
+        commandClientBuilder.setCoOwnerIds("177135083222859776");
         commandClientBuilder.setPrefix("!");
         commandClientBuilder.setEmojis("\uD83D\uDE03", "\uD83D\uDE2E", "\uD83D\uDE26");
         commandClientBuilder.addCommand(new ShutdownCommand());
@@ -633,21 +634,31 @@ public class Main {
         Message messageVerif = textChannel.sendMessage(new EmbedBuilder().setDescription("Demande en attende de vérification par un délégué•e ou un professeur...").setColor(Color.GREEN).build()).complete();
         StringBuilder text = new StringBuilder();
         if (role.equals(Role.PROF))
-            text.append("<@").append(Role.DELEGUE.getRoleId()).append(">, ").append("<@").append(member.getIdLong()).append("> souhaite rejoindre le discord, cette personne est-elle dans votre classe?");
+            text.append("<@").append(Role.DELEGUE.getRoleId()).append(">, ").append("<@").append(member.getIdLong()).append("> souhaite rejoindre le discord en tant que professeur, cette personne est-elle bien professeur?");
         else
-            text.append("<@").append(classe.getDiscord_role_id()).append(">, ").append("<@").append(member.getIdLong()).append("> souhaite rejoindre le discord, cette personne est-elle dans votre classe?");
+            text.append("<@").append(classe.getDiscord_role_id()).append(">, ").append("<@").append(member.getIdLong()).append("> souhaite rejoindre le discord en tant qu'élève, cette personne est-elle dans votre classe?");
+        if (prenom.length() != 0)
+            text.append("\nPrénom: ").append(prenom);
+        if (nom.length() != 0)
+            text.append("\nNom: ").append(nom);
         if (level != null)
-            text.append("\n").append(level.getName());
+            text.append("\nNiveau: ").append(level.getName());
         if (classe != null)
-            text.append("\n").append(classe.getName());
-        text.append("\n").append(delegue);
-        new ButtonMenu.Builder()
+            text.append("\nClasse principale: ").append(classe.getName());
+        if (!role.equals(Role.PROF))
+            if (delegue)
+                text.append("\nDélégué•e: Oui");
+            else
+                text.append("\nDélégué•e: Non");
+        new OrderedMenu.Builder()
                 .setText(text.toString())
-                .setChoices(VALIDER_EMOTE, ANNULER_EMOTE)
                 .setEventWaiter(eventWaiter)
                 .setTimeout(30, TimeUnit.DAYS)
-                .setAction(re -> {
-                    if (re.getName().equals(VALIDER_EMOTE)) {
+                .useNumbers()
+                .allowTextInput(true)
+                .addChoices("Accepter", "Refuser")
+                .setSelection((message, integer) -> {
+                    if (integer == 1) {
                         //ACCEPT
                         try {
                             UserBean userBean = dataServiceManager.getUser(member.getIdLong(), new UserBean(member.getIdLong(), prenom, nom, role.getId(), delegue, 0, "", false));
@@ -677,7 +688,7 @@ public class Main {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                    } else if (re.getName().equals(ANNULER_EMOTE)) {
+                    } else if (integer == 2) {
                         //REFUSE
                         try {
                             dataServiceManager.deleteUser(member.getIdLong());
@@ -689,7 +700,6 @@ public class Main {
                         }
                     }
                 })
-                .setFinalAction(message -> message.delete().queue())
                 .build().display(jda.getTextChannelById(DEMANDES_CHANNEL_ID));
     }
 
