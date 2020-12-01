@@ -318,6 +318,7 @@ public class Main {
                 .setSelectionConsumer((message, integer) -> {
                     //CONTINUE
                     Main.joinClasse(member, classes.get(integer));
+                    message.delete().queue();
                     cmdStart(member, textChannel);
                 })
                 .setCanceled(message -> {
