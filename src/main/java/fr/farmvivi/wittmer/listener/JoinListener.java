@@ -2,6 +2,8 @@ package fr.farmvivi.wittmer.listener;
 
 import fr.farmvivi.wittmer.Main;
 import fr.farmvivi.wittmer.Role;
+import fr.farmvivi.wittmer.menu.verif.MenuVerifFinal;
+import fr.farmvivi.wittmer.menu.verif.MenuVerifStart;
 import fr.farmvivi.wittmer.persistanceapi.beans.users.ClasseBean;
 import fr.farmvivi.wittmer.persistanceapi.beans.users.UserBean;
 import net.dv8tion.jda.api.JDA;
@@ -42,13 +44,13 @@ public class JoinListener extends ListenerAdapter {
                 UserBean userBean = Main.dataServiceManager.getUser(member.getIdLong(), new UserBean(member.getIdLong(), "", "", (short) 0, false, 0, "", false));
                 Role role = Role.getById(userBean.getRole());
                 if (Objects.requireNonNull(role).equals(Role.PROF)) {
-                    Main.verifFinal(member, textChannel, role, null, null, userBean.isDelegue(), userBean.getPrenom(), userBean.getNom());
+                    MenuVerifFinal.execute(member, textChannel, role, null, null, userBean.isDelegue(), userBean.getPrenom(), userBean.getNom());
                 } else {
                     ClasseBean classeBean = Main.dataServiceManager.getUserDefaultClasse(userBean);
-                    Main.verifFinal(member, textChannel, role, classeBean.getLevel(), classeBean, userBean.isDelegue(), userBean.getPrenom(), userBean.getNom());
+                    MenuVerifFinal.execute(member, textChannel, role, classeBean.getLevel(), classeBean, userBean.isDelegue(), userBean.getPrenom(), userBean.getNom());
                 }
             } else {
-                Main.verifAskStart(member, textChannel);
+                MenuVerifStart.execute(member, textChannel);
             }
         } catch (Exception e) {
             e.printStackTrace();
