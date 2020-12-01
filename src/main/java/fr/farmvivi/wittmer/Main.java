@@ -34,6 +34,7 @@ public class Main {
     public static final String VALIDER_EMOTE = "\u2705";
     public static final long OWNER_ID = 751882667812847706L;
     public static final long GUILD_ID = 753631957606203474L;
+    public static final long ADMIN_ROLE_ID = 783309691748089867L;
     public static final long VERIF_CATEGORY_ID = 782655620586668102L;
     public static final long COMMANDS_CATEGORY_ID = 782945519806316584L;
     public static final Logger logger = LoggerFactory.getLogger(name);
@@ -98,6 +99,7 @@ public class Main {
         commandClientBuilder.setPrefix("!");
         commandClientBuilder.setEmojis("\uD83D\uDE03", "\uD83D\uDE2E", "\uD83D\uDE26");
         commandClientBuilder.addCommand(new ShutdownCommand());
+        commandClientBuilder.addCommand(new AdminCommand());
         commandClientBuilder.addCommand(new CatCommand());
         commandClientBuilder.addCommand(new ChooseCommand());
         commandClientBuilder.addCommand(new PingCommand());
