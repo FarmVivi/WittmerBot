@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public class MenuCommandEleveAskJoinClasse {
+public class MenuCommandEleveJoinClasseAskMatiere {
     public static void execute(Member member, TextChannel textChannel) {
         try {
             UserBean userBean = Main.dataServiceManager.getUser(member.getIdLong(), new UserBean(member.getIdLong(), "", "", (short) 0, false, 0, "", false));
@@ -26,7 +26,7 @@ public class MenuCommandEleveAskJoinClasse {
                     .useLooping(true)
                     .setSelectionConsumer((message, integer) -> {
                         //CONTINUE
-                        MenuCommandEleveAskJoinClasseMatiere.execute(member, textChannel, userBean, matieres.get(integer));
+                        MenuCommandEleveJoinClasseAskClasse.execute(member, textChannel, userBean, matieres.get(integer));
                         message.delete().queue();
                     })
                     .setCanceled(message -> {
@@ -35,7 +35,7 @@ public class MenuCommandEleveAskJoinClasse {
                     });
             int i = 0;
             try {
-                List<Matiere> matieresTemp = MenuCommandEleveAskJoinClasseUtils.getJoinableMatieres(userBean);
+                List<Matiere> matieresTemp = MenuCommandEleveJoinClasseUtils.getJoinableMatieres(userBean);
                 if (matieresTemp.isEmpty()) {
                     textChannel.sendMessage(Main.commandClient.getError() + " Vous ne pouvez pas rejoindre d'autres classes")
                             .delay(10, TimeUnit.SECONDS)

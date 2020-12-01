@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class MenuCommandProfAskCreateChannelLevel {
+public class MenuCommandProfCreateChannelAskClasse {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void execute(Member member, TextChannel textChannel, Level level) {
         Map<Integer, ClasseBean> classes = new HashMap<>();

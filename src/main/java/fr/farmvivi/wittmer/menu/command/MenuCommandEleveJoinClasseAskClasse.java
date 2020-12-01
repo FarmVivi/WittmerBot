@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public class MenuCommandEleveAskJoinClasseMatiere {
+public class MenuCommandEleveJoinClasseAskClasse {
     @SuppressWarnings("StringBufferReplaceableByString")
     public static void execute(Member member, TextChannel textChannel, UserBean userBean, Matiere matiere) {
         Map<Integer, ClasseBean> classes = new HashMap<>();
@@ -35,7 +35,7 @@ public class MenuCommandEleveAskJoinClasseMatiere {
                     MenuCommandStart.execute(member, textChannel);
                 });
         int i = 0;
-        List<ClasseBean> finalClasses = MenuCommandEleveAskJoinClasseUtils.getJoinableClasses(userBean, matiere);
+        List<ClasseBean> finalClasses = MenuCommandEleveJoinClasseUtils.getJoinableClasses(userBean, matiere);
         if (finalClasses.isEmpty()) {
             textChannel.sendMessage(Main.commandClient.getError() + " ERREUR: Vous ne pouvez rejoindre aucune classe de la matière " + matiere.getName())
                     .delay(10, TimeUnit.SECONDS)

@@ -8,7 +8,7 @@ import fr.farmvivi.wittmer.persistanceapi.beans.users.UserBean;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MenuCommandEleveAskJoinClasseUtils {
+public class MenuCommandEleveJoinClasseUtils {
     public static List<Matiere> getJoinableMatieres(UserBean userBean) {
         List<Matiere> matieres = new ArrayList<>();
         for (Matiere matiere : Matiere.values()) {

@@ -24,7 +24,7 @@ public class MenuCommandStart {
                         .setSelection((message, integer) -> {
                             if (integer == 1) {
                                 //CREATE VOCAL
-                                MenuCommandProfAskCreateChannel.execute(member, textChannel);
+                                MenuCommandProfCreateChannelAskLevel.execute(member, textChannel);
                             }
                         })
                         .build().display(textChannel);
@@ -38,7 +38,7 @@ public class MenuCommandStart {
                         .setSelection((message, integer) -> {
                             if (integer == 1) {
                                 //JOIN CLASS
-                                MenuCommandEleveAskJoinClasse.execute(member, textChannel);
+                                MenuCommandEleveJoinClasseAskMatiere.execute(member, textChannel);
                             }
                         })
                         .build().display(textChannel);
