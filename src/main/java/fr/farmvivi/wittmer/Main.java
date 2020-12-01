@@ -28,7 +28,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class Main {
-    public static final String version = "1.0.1.0";
+    public static final String version = "1.0.1.1";
     public static final String name = "Wittmer";
     public static final boolean production = false;
     public static final String ANNULER_EMOTE = "\u274C";
@@ -246,7 +246,7 @@ public class Main {
                         .setSelection((message, integer) -> {
                             if (integer == 1) {
                                 //JOIN CLASS
-                                cmdEleveAskJoinClasse(member, textChannel, userBean);
+                                cmdEleveAskJoinClasse(member, textChannel);
                             }
                         })
                         .build().display(textChannel);
@@ -256,52 +256,57 @@ public class Main {
         }
     }
 
-    public static void cmdEleveAskJoinClasse(Member member, TextChannel textChannel, UserBean userBean) {
-        Map<Integer, Matiere> matieres = new HashMap<>();
-        SelectionDialog.Builder builder = new SelectionDialog.Builder()
-                .setText("Naviguez parmi ce menu pour choisir la matière que vous voulez rejoindre")
-                .setEventWaiter(eventWaiter)
-                .setTimeout(30, TimeUnit.DAYS)
-                .setSelectedEnds(">**", "**<")
-                .useSingleSelectionMode(true)
-                .useLooping(true)
-                .setSelectionConsumer((message, integer) -> {
-                    //CONTINUE
-                    if (integer == 0) {
-                        cmdStart(member, textChannel);
-                    } else
-                        cmdEleveAskJoinClasseMatiere(member, textChannel, userBean, matieres.get(integer));
-                    message.delete().queue();
-                })
-                .setCanceled(message -> {
-                    message.delete().queue();
-                    cmdStart(member, textChannel);
-                });
-        int i = 0;
+    public static void cmdEleveAskJoinClasse(Member member, TextChannel textChannel) {
         try {
-            List<Matiere> matieresTemp = getJoinableMatieres(userBean);
-            if (matieresTemp.isEmpty()) {
-                textChannel.sendMessage(commandClient.getError() + " Vous ne pouvez pas rejoindre d'autres classes")
-                        .delay(10, TimeUnit.SECONDS)
-                        .flatMap(message -> {
-                            message.delete().queue();
+            UserBean userBean = dataServiceManager.getUser(member.getIdLong(), new UserBean(member.getIdLong(), "", "", (short) 0, false, 0, "", false));
+            Map<Integer, Matiere> matieres = new HashMap<>();
+            SelectionDialog.Builder builder = new SelectionDialog.Builder()
+                    .setText("Naviguez parmi ce menu pour choisir la matière que vous voulez rejoindre")
+                    .setEventWaiter(eventWaiter)
+                    .setTimeout(30, TimeUnit.DAYS)
+                    .setSelectedEnds(">**", "**<")
+                    .useSingleSelectionMode(true)
+                    .useLooping(true)
+                    .setSelectionConsumer((message, integer) -> {
+                        //CONTINUE
+                        if (integer == 0) {
                             cmdStart(member, textChannel);
-                            return null;
-                        }).queue();
-                return;
-            } else {
-                for (Matiere matiere : matieresTemp) {
-                    if (matiere.equals(Matiere.AUCUNE))
-                        continue;
-                    i++;
-                    builder.addChoices(matiere.getName());
-                    matieres.put(i, matiere);
+                        } else
+                            cmdEleveAskJoinClasseMatiere(member, textChannel, userBean, matieres.get(integer));
+                        message.delete().queue();
+                    })
+                    .setCanceled(message -> {
+                        message.delete().queue();
+                        cmdStart(member, textChannel);
+                    });
+            int i = 0;
+            try {
+                List<Matiere> matieresTemp = getJoinableMatieres(userBean);
+                if (matieresTemp.isEmpty()) {
+                    textChannel.sendMessage(commandClient.getError() + " Vous ne pouvez pas rejoindre d'autres classes")
+                            .delay(10, TimeUnit.SECONDS)
+                            .flatMap(message -> {
+                                message.delete().queue();
+                                cmdStart(member, textChannel);
+                                return null;
+                            }).queue();
+                    return;
+                } else {
+                    for (Matiere matiere : matieresTemp) {
+                        if (matiere.equals(Matiere.AUCUNE))
+                            continue;
+                        i++;
+                        builder.addChoices(matiere.getName());
+                        matieres.put(i, matiere);
+                    }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+            builder.build().display(textChannel);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        builder.build().display(textChannel);
     }
 
     public static void cmdEleveAskJoinClasseMatiere(Member member, TextChannel textChannel, UserBean userBean, Matiere matiere) {
