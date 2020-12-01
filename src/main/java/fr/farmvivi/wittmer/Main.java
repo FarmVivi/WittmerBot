@@ -228,7 +228,6 @@ public class Main {
                         .setEventWaiter(eventWaiter)
                         .setTimeout(30, TimeUnit.DAYS)
                         .useNumbers()
-                        .allowTextInput(true)
                         .addChoices("Créer un salon vocal de cours")
                         .setSelection((message, integer) -> {
                             if (integer == 1) {
@@ -243,7 +242,6 @@ public class Main {
                         .setEventWaiter(eventWaiter)
                         .setTimeout(30, TimeUnit.DAYS)
                         .useNumbers()
-                        .allowTextInput(true)
                         .addChoices("Rejoindre une classe")
                         .setSelection((message, integer) -> {
                             if (integer == 1) {
@@ -318,7 +316,6 @@ public class Main {
                 .setEventWaiter(eventWaiter)
                 .setTimeout(30, TimeUnit.DAYS)
                 .useNumbers()
-                .allowTextInput(true)
                 .setSelection((message, integer) -> {
                     //CONTINUE
                     Main.joinClasse(member, classes.get(integer));
@@ -385,7 +382,6 @@ public class Main {
                 .setEventWaiter(eventWaiter)
                 .setTimeout(30, TimeUnit.DAYS)
                 .useNumbers()
-                .allowTextInput(true)
                 .addChoices("Seconde", "Première", "Terminale")
                 .setSelection((message, integer) -> {
                     if (integer == 1) {
@@ -410,7 +406,6 @@ public class Main {
                 .setEventWaiter(eventWaiter)
                 .setTimeout(30, TimeUnit.DAYS)
                 .useNumbers()
-                .allowTextInput(true)
                 .setSelection((message, integer) -> {
                     //CONTINUE
                     Guild guild = jda.getGuildById(GUILD_ID);
@@ -479,7 +474,6 @@ public class Main {
                 .setEventWaiter(eventWaiter)
                 .setTimeout(30, TimeUnit.DAYS)
                 .useNumbers()
-                .allowTextInput(true)
                 .addChoices("Élève", "Professeur")
                 .setSelection((message, integer) -> {
                     if (integer == 1) {
@@ -499,7 +493,6 @@ public class Main {
                 .setEventWaiter(eventWaiter)
                 .setTimeout(30, TimeUnit.DAYS)
                 .useNumbers()
-                .allowTextInput(true)
                 .addChoices("Seconde", "Première", "Terminale")
                 .setSelection((message, integer) -> {
                     if (integer == 1) {
@@ -523,7 +516,6 @@ public class Main {
                 .setEventWaiter(eventWaiter)
                 .setTimeout(30, TimeUnit.DAYS)
                 .useNumbers()
-                .allowTextInput(true)
                 .setSelection((message, integer) -> {
                     //CONTINUE
                     verifAskDeleguee(member, textChannel, role, level, classes.get(integer));
@@ -559,7 +551,6 @@ public class Main {
                 .setEventWaiter(eventWaiter)
                 .setTimeout(30, TimeUnit.DAYS)
                 .useNumbers()
-                .allowTextInput(true)
                 .addChoices("Délégué•e", "Pas délégué•e")
                 .setSelection((message, integer) -> {
                     if (integer == 1) {
@@ -580,7 +571,6 @@ public class Main {
                     .setEventWaiter(eventWaiter)
                     .setTimeout(30, TimeUnit.DAYS)
                     .useNumbers()
-                    .allowTextInput(true)
                     .addChoices("Monsieur", "Madame")
                     .setSelection((message, integer) -> {
                         if (integer == 1) {
@@ -634,9 +624,9 @@ public class Main {
         Message messageVerif = textChannel.sendMessage(new EmbedBuilder().setDescription("Demande en attende de vérification par un délégué•e ou un professeur...").setColor(Color.GREEN).build()).complete();
         StringBuilder text = new StringBuilder();
         if (role.equals(Role.PROF))
-            text.append("<@").append(Role.DELEGUE.getRoleId()).append(">, ").append("<@").append(member.getIdLong()).append("> souhaite rejoindre le discord en tant que professeur, cette personne est-elle bien professeur?");
+            text.append("<@&").append(Role.DELEGUE.getRoleId()).append(">, ").append("<@").append(member.getIdLong()).append("> souhaite rejoindre le discord en tant que professeur, cette personne est-elle bien professeur?");
         else
-            text.append("<@").append(classe.getDiscord_role_id()).append(">, ").append("<@").append(member.getIdLong()).append("> souhaite rejoindre le discord en tant qu'élève, cette personne est-elle dans votre classe?");
+            text.append("<@&").append(classe.getDiscord_role_id()).append(">, ").append("<@").append(member.getIdLong()).append("> souhaite rejoindre le discord en tant qu'élève, cette personne est-elle dans votre classe?");
         if (prenom.length() != 0)
             text.append("\nPrénom: ").append(prenom);
         if (nom.length() != 0)
@@ -655,7 +645,6 @@ public class Main {
                 .setEventWaiter(eventWaiter)
                 .setTimeout(30, TimeUnit.DAYS)
                 .useNumbers()
-                .allowTextInput(true)
                 .addChoices("Accepter", "Refuser")
                 .setSelection((message, integer) -> {
                     if (integer == 1) {
