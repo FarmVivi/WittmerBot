@@ -33,7 +33,7 @@ public class Main {
     public static final boolean production = false;
     public static final String ANNULER_EMOTE = "\u274C";
     public static final String VALIDER_EMOTE = "\u2705";
-    public static final long OWNER_ID = 177135083222859776L;
+    public static final long OWNER_ID = 751882667812847706L;
     public static final long GUILD_ID = 753631957606203474L;
     public static final long VERIF_CATEGORY_ID = 782655620586668102L;
     public static final long COMMANDS_CATEGORY_ID = 782945519806316584L;
@@ -144,11 +144,12 @@ public class Main {
         List<Permission> channelAllow1 = new ArrayList<>();
         channelAllow1.add(Permission.MESSAGE_READ);
         channelAllow1.add(Permission.VOICE_CONNECT);
-        channelAction1.addMemberPermissionOverride(OWNER_ID, channelAllow1, new ArrayList<>());
+        channelAction1.addRolePermissionOverride(Role.DELEGUE.getRoleId(), channelAllow1, new ArrayList<>());
+        channelAction1.addRolePermissionOverride(Role.PROF.getRoleId(), channelAllow1, new ArrayList<>());
         logger.info("Create \uD83C\uDD95 Demandes verif channel...");
         DEMANDES_CHANNEL_ID = channelAction1.complete().getIdLong();
         for (Member member : guild.getMembers()) {
-            if (!production && member.getIdLong() != OWNER_ID && member.getIdLong() != 751882667812847706L)
+            if (!production && member.getIdLong() != OWNER_ID)
                 continue;
             if (member.getRoles().isEmpty()) {
                 logger.info("Create " + member.getUser().getName() + " verif channel...");
@@ -186,7 +187,7 @@ public class Main {
             guildChannel.delete().queue();
         }
         for (Member member : guild.getMembers()) {
-            if (!production && member.getIdLong() != OWNER_ID && member.getIdLong() != 751882667812847706L)
+            if (!production && member.getIdLong() != OWNER_ID)
                 continue;
             try {
                 if (!dataServiceManager.isUserCreated(member.getIdLong()))
@@ -629,9 +630,12 @@ public class Main {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void verifFinal(Member member, TextChannel textChannel, Role role, Level level, ClasseBean classe, boolean delegue, String prenom, String nom) {
-        Message messageVerif = textChannel.sendMessage(new EmbedBuilder().setDescription("Demande en attende de vérification...").setColor(Color.GREEN).build()).complete();
-        StringBuilder text = new StringBuilder("<@" + member.getIdLong() + ">, " + prenom + " " + nom +
-                "\n" + role.name());
+        Message messageVerif = textChannel.sendMessage(new EmbedBuilder().setDescription("Demande en attende de vérification par un délégué•e ou un professeur...").setColor(Color.GREEN).build()).complete();
+        StringBuilder text = new StringBuilder();
+        if (role.equals(Role.PROF))
+            text.append("<@").append(Role.DELEGUE.getRoleId()).append(">, ").append("<@").append(member.getIdLong()).append("> souhaite rejoindre le discord, cette personne est-elle dans votre classe?");
+        else
+            text.append("<@").append(classe.getDiscord_role_id()).append(">, ").append("<@").append(member.getIdLong()).append("> souhaite rejoindre le discord, cette personne est-elle dans votre classe?");
         if (level != null)
             text.append("\n").append(level.getName());
         if (classe != null)
