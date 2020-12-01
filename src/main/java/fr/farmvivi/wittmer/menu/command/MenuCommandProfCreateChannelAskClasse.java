@@ -45,7 +45,7 @@ public class MenuCommandProfCreateChannelAskClasse {
             List<ClasseBean> classeBeans = Main.dataServiceManager.getClasseOfAProf(member.getIdLong(), level);
             if (classeBeans.isEmpty()) {
                 textChannel.sendMessage(Main.commandClient.getError() + " ERREUR: Aucune classe d'enregistré en " + level.getName())
-                        .delay(10, TimeUnit.SECONDS)
+                        .delay(5, TimeUnit.SECONDS)
                         .flatMap(message -> {
                             message.delete().queue();
                             MenuCommandStart.execute(member, textChannel);

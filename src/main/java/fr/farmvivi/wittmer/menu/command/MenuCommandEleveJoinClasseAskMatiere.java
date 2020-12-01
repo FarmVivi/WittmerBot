@@ -38,7 +38,7 @@ public class MenuCommandEleveJoinClasseAskMatiere {
                 List<Matiere> matieresTemp = MenuCommandEleveJoinClasseUtils.getJoinableMatieres(userBean);
                 if (matieresTemp.isEmpty()) {
                     textChannel.sendMessage(Main.commandClient.getError() + " Vous ne pouvez pas rejoindre d'autres classes")
-                            .delay(10, TimeUnit.SECONDS)
+                            .delay(5, TimeUnit.SECONDS)
                             .flatMap(message -> {
                                 message.delete().queue();
                                 MenuCommandStart.execute(member, textChannel);

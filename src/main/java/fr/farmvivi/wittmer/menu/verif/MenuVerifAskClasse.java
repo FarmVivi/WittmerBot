@@ -31,7 +31,7 @@ public class MenuVerifAskClasse {
             List<ClasseBean> classeBeans = Main.dataServiceManager.getClassesListOfALevelAndMatiere(level, Matiere.AUCUNE);
             if (classeBeans.isEmpty()) {
                 textChannel.sendMessage(Main.commandClient.getError() + " ERREUR: Aucune classe d'enregistré en " + level.getName())
-                        .delay(10, TimeUnit.SECONDS)
+                        .delay(5, TimeUnit.SECONDS)
                         .flatMap(message -> {
                             message.delete().queue();
                             MenuVerifStart.execute(member, textChannel);
