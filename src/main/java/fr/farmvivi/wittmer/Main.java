@@ -269,10 +269,7 @@ public class Main {
                     .useLooping(true)
                     .setSelectionConsumer((message, integer) -> {
                         //CONTINUE
-                        if (integer == 0) {
-                            cmdStart(member, textChannel);
-                        } else
-                            cmdEleveAskJoinClasseMatiere(member, textChannel, userBean, matieres.get(integer));
+                        cmdEleveAskJoinClasseMatiere(member, textChannel, userBean, matieres.get(integer));
                         message.delete().queue();
                     })
                     .setCanceled(message -> {
@@ -311,14 +308,20 @@ public class Main {
 
     public static void cmdEleveAskJoinClasseMatiere(Member member, TextChannel textChannel, UserBean userBean, Matiere matiere) {
         Map<Integer, ClasseBean> classes = new HashMap<>();
-        OrderedMenu.Builder builder = new OrderedMenu.Builder()
-                .setText("Cliquez sur la classe que vous voulez rejoindre")
+        SelectionDialog.Builder builder = new SelectionDialog.Builder()
+                .setText("Naviguez parmi ce menu pour choisir la classe que vous voulez rejoindre")
                 .setEventWaiter(eventWaiter)
                 .setTimeout(30, TimeUnit.DAYS)
-                .useNumbers()
-                .setSelection((message, integer) -> {
+                .setSelectedEnds(">**", "**<")
+                .useSingleSelectionMode(true)
+                .useLooping(true)
+                .setSelectionConsumer((message, integer) -> {
                     //CONTINUE
                     Main.joinClasse(member, classes.get(integer));
+                    cmdStart(member, textChannel);
+                })
+                .setCanceled(message -> {
+                    message.delete().queue();
                     cmdStart(member, textChannel);
                 });
         int i = 0;
@@ -334,9 +337,20 @@ public class Main {
             return;
         } else {
             for (ClasseBean classeBean : finalClasses) {
-                i++;
-                builder.addChoice(classeBean.getName());
-                classes.put(i, classeBean);
+                try {
+                    i++;
+                    UserBean profBean = dataServiceManager.getUser(classeBean.getDiscord_prof_id(), new UserBean(member.getIdLong(), "", "", (short) 0, false, 0, "", false));
+                    @SuppressWarnings("StringBufferReplaceableByString") StringBuilder classeName = new StringBuilder(classeBean.getName());
+                    classeName.append(" - ");
+                    classeName.append(profBean.getPrenom().toUpperCase(), 0, 1);
+                    classeName.append(profBean.getPrenom(), 1, profBean.getPrenom().length());
+                    classeName.append(" ");
+                    classeName.append(profBean.getNom().toUpperCase());
+                    builder.addChoices(classeName.toString());
+                    classes.put(i, classeBean);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
         builder.build().display(textChannel);
