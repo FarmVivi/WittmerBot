@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class Main {
-    public static final String version = "1.0.1.1";
+    public static final String version = "1.0.2.0";
     public static final String name = "Wittmer";
     public static final boolean production = false;
     public static final String VALIDER_EMOTE = "\u2705";

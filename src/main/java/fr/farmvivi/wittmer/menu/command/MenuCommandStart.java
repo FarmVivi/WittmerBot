@@ -20,11 +20,14 @@ public class MenuCommandStart {
                         .setEventWaiter(Main.eventWaiter)
                         .setTimeout(30, TimeUnit.DAYS)
                         .useNumbers()
-                        .addChoices("Créer un salon vocal de cours")
+                        .addChoices("Créer un salon vocal de cours", "Créer une classe")
                         .setSelection((message, integer) -> {
                             if (integer == 1) {
                                 //CREATE VOCAL
                                 MenuCommandProfCreateChannelAskLevel.execute(member, textChannel);
+                            } else if (integer == 2) {
+                                //CREATE CLASSE
+                                MenuCommandProfCreateClasseAskLevel.execute(member, textChannel);
                             }
                         })
                         .build().display(textChannel);
@@ -37,7 +40,7 @@ public class MenuCommandStart {
                         .addChoices("Rejoindre une classe")
                         .setSelection((message, integer) -> {
                             if (integer == 1) {
-                                //JOIN CLASS
+                                //JOIN CLASSE
                                 MenuCommandEleveJoinClasseAskMatiere.execute(member, textChannel);
                             }
                         })
