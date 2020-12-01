@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 public class MenuCommandProfCreateClasseAskClasseNumber {
     public static void execute(Member member, TextChannel textChannel, Level level, Matiere matiere) {
         new OrderedMenu.Builder()
-                .setText("Cliquez sur l'emoji correspondant au numéro de la classe crée (exemple: )")
+                .setText("Cliquez sur l'emoji correspondant au numéro de la classe crée\n(exemple: 3 pour le 3ème groupe de spécialité Mathématiques,\nNormalement le numéro de groupe est marqué dans l'emploi du temps sur Éclat)")
                 .setEventWaiter(Main.eventWaiter)
                 .setTimeout(30, TimeUnit.DAYS)
                 .useNumbers()

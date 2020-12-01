@@ -30,7 +30,7 @@ import java.util.Objects;
 public class Main {
     public static final String version = "1.0.2.0";
     public static final String name = "Wittmer";
-    public static final boolean production = false;
+    public static final boolean production = true;
     public static final String VALIDER_EMOTE = "\u2705";
     public static final long OWNER_ID = 751882667812847706L;
     public static final long GUILD_ID = 753631957606203474L;
