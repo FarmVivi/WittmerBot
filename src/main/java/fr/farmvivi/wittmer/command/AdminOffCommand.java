@@ -6,10 +6,10 @@ import fr.farmvivi.wittmer.Main;
 
 import java.util.Objects;
 
-public class AdminCommand extends Command {
-    public AdminCommand() {
-        this.name = "admin";
-        this.help = "Devenir administrateur";
+public class AdminOffCommand extends Command {
+    public AdminOffCommand() {
+        this.name = "adminoff";
+        this.help = "Ne plus devenir administrateur";
         this.guildOnly = true;
         this.ownerCommand = true;
     }
@@ -17,6 +17,6 @@ public class AdminCommand extends Command {
     @Override
     protected void execute(CommandEvent commandEvent) {
         commandEvent.getMessage().delete().complete();
-        commandEvent.getGuild().addRoleToMember(commandEvent.getAuthor().getIdLong(), Objects.requireNonNull(commandEvent.getGuild().getRoleById(Main.ADMIN_ROLE_ID))).queue();
+        commandEvent.getGuild().removeRoleFromMember(commandEvent.getAuthor().getIdLong(), Objects.requireNonNull(commandEvent.getGuild().getRoleById(Main.ADMIN_ROLE_ID))).queue();
     }
 }

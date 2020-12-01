@@ -99,7 +99,8 @@ public class Main {
         commandClientBuilder.setPrefix("!");
         commandClientBuilder.setEmojis("\uD83D\uDE03", "\uD83D\uDE2E", "\uD83D\uDE26");
         commandClientBuilder.addCommand(new ShutdownCommand());
-        commandClientBuilder.addCommand(new AdminCommand());
+        commandClientBuilder.addCommand(new AdminOnCommand());
+        commandClientBuilder.addCommand(new AdminOffCommand());
         commandClientBuilder.addCommand(new CatCommand());
         commandClientBuilder.addCommand(new ChooseCommand());
         commandClientBuilder.addCommand(new PingCommand());
