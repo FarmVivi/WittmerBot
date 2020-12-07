@@ -19,6 +19,7 @@ public class MenuCommandStart {
                         .setText("Cliquez sur l'emoji correspondant à ce que vous voulez faire")
                         .setEventWaiter(Main.eventWaiter)
                         .setTimeout(30, TimeUnit.DAYS)
+                        .allowTextInput(false)
                         .useNumbers()
                         .addChoices("Créer un salon vocal de cours", "Créer une classe")
                         .setSelection((message, integer) -> {
@@ -36,6 +37,7 @@ public class MenuCommandStart {
                         .setText("Cliquez sur l'emoji correspondant à ce que vous voulez faire")
                         .setEventWaiter(Main.eventWaiter)
                         .setTimeout(30, TimeUnit.DAYS)
+                        .allowTextInput(false)
                         .useNumbers()
                         .addChoices("Rejoindre une classe")
                         .setSelection((message, integer) -> {

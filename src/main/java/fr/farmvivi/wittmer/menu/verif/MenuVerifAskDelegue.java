@@ -16,6 +16,7 @@ public class MenuVerifAskDelegue {
                 .setText("Cliquez sur l'emoji correspondant à votre situation")
                 .setEventWaiter(Main.eventWaiter)
                 .setTimeout(30, TimeUnit.DAYS)
+                .allowTextInput(false)
                 .useNumbers()
                 .addChoices("Délégué•e", "Pas délégué•e")
                 .setSelection((message, integer) -> {

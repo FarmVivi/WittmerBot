@@ -44,6 +44,7 @@ public class MenuVerifFinal {
                 .setText(text.toString())
                 .setEventWaiter(Main.eventWaiter)
                 .setTimeout(30, TimeUnit.DAYS)
+                .allowTextInput(false)
                 .useNumbers()
                 .addChoices("Oui", "Non")
                 .setSelection((message, integer) -> {

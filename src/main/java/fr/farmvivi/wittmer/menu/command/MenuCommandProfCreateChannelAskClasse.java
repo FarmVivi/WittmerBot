@@ -22,6 +22,7 @@ public class MenuCommandProfCreateChannelAskClasse {
                 .setText("Quelle est la classe concernée?")
                 .setEventWaiter(Main.eventWaiter)
                 .setTimeout(30, TimeUnit.DAYS)
+                .allowTextInput(false)
                 .useNumbers()
                 .setSelection((message, integer) -> {
                     //CONTINUE

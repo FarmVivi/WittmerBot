@@ -15,6 +15,7 @@ public class MenuCommandProfCreateClasseAskClasseNumber {
                 .setText("Cliquez sur l'emoji correspondant au numéro de la classe crée\n(exemple: 3 pour le 3ème groupe de spécialité Mathématiques,\nNormalement le numéro de groupe est marqué dans l'emploi du temps sur Éclat)")
                 .setEventWaiter(Main.eventWaiter)
                 .setTimeout(30, TimeUnit.DAYS)
+                .allowTextInput(false)
                 .useNumbers()
                 .addChoices("1", "2", "3", "4", "5", "6", "7", "8", "9")
                 .setSelection((message, integer) -> {

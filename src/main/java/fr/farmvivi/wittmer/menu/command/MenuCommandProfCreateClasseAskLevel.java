@@ -14,6 +14,7 @@ public class MenuCommandProfCreateClasseAskLevel {
                 .setText("Quel est le niveau concerné par la création de classe?")
                 .setEventWaiter(Main.eventWaiter)
                 .setTimeout(30, TimeUnit.DAYS)
+                .allowTextInput(false)
                 .useNumbers()
                 .addChoices("Seconde", "Première", "Terminale")
                 .setSelection((message, integer) -> {

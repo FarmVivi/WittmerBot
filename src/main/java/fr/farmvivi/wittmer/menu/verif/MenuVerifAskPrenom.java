@@ -19,6 +19,7 @@ public class MenuVerifAskPrenom {
                     .setText("Cliquez sur l'emoji correspondant à votre situation")
                     .setEventWaiter(Main.eventWaiter)
                     .setTimeout(30, TimeUnit.DAYS)
+                    .allowTextInput(false)
                     .useNumbers()
                     .addChoices("Monsieur", "Madame")
                     .setSelection((message, integer) -> {

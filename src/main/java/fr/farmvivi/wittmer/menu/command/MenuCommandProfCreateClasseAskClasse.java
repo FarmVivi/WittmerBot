@@ -20,6 +20,7 @@ public class MenuCommandProfCreateClasseAskClasse {
                 .setText("Cliquez sur l'emoji correspondant à la classe concerné par la création de classe")
                 .setEventWaiter(Main.eventWaiter)
                 .setTimeout(30, TimeUnit.DAYS)
+                .allowTextInput(false)
                 .useNumbers()
                 .setSelection((message, integer) -> {
                     //CONTINUE
