@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 public class MenuVerifStart {
     public static void execute(Member member, TextChannel textChannel) {
         new ButtonMenu.Builder()
-                .setText("Bonjour <@" + member.getIdLong() + "> et bienvenue sur le discord du **Lycée Julien Wittmer**,\n" +
+                .setText("Bonjour <@" + member.getIdLong() + "> et bienvenue sur le discord du **Lycée Julien Wittmer** géré par des élèves,\n" +
                         "\n" +
                         "Pour vous orienter correctement sur ce serveur, vous devrez répondre aux questions que je vais vous poser.\n" +
                         "\n" +
