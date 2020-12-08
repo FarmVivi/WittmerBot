@@ -101,8 +101,6 @@ public class Main {
         commandClientBuilder.addCommand(new ShutdownCommand());
         commandClientBuilder.addCommand(new AdminOnCommand());
         commandClientBuilder.addCommand(new AdminOffCommand());
-        commandClientBuilder.addCommand(new CatCommand());
-        commandClientBuilder.addCommand(new ChooseCommand());
         commandClientBuilder.addCommand(new PingCommand());
         commandClientBuilder.addCommand(new CreateClasseCommand());
         commandClient = commandClientBuilder.build();
