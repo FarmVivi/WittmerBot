@@ -28,18 +28,20 @@ import java.util.List;
 import java.util.Objects;
 
 public class Main {
-    public static final String version = "1.0.2.2";
+    public static final String version = "1.0.3.0";
     public static final String name = "Wittmer";
-    public static final boolean production = false;
+    public static final boolean production = true;
     public static final String VALIDER_EMOTE = "\u2705";
     public static final long OWNER_ID = 751882667812847706L;
     public static final long GUILD_ID = 753631957606203474L;
     public static final long ADMIN_ROLE_ID = 783309691748089867L;
     public static final long VERIF_CATEGORY_ID = 782655620586668102L;
-    public static final long COMMANDS_CATEGORY_ID = 782945519806316584L;
+    public static final long ACTIONS_CATEGORY_ID = 782945519806316584L;
     public static final Logger logger = LoggerFactory.getLogger(name);
     private static final String TOKEN = "NzU0MDI5NjAxMDM0MDc2MTYw.X1uyyg.BhL4K5V9vvEUenmfTR31xrCt6IA";
     public static long DEMANDES_CHANNEL_ID;
+    public static long ACTIONS_ELEVES_CHANNEL_ID;
+    public static long ACTIONS_PROFS_CHANNEL_ID;
     public static JDA jda;
     public static DataServiceManager dataServiceManager;
     public static CommandClient commandClient;
@@ -79,10 +81,7 @@ public class Main {
 
         logger.info("Connexion à la base de données...");
         try {
-            if (production)
-                dataServiceManager = new DataServiceManager("172.18.0.1", "u273_MqKTNG9st6", "qRymrkh+x!6!OJNZtHLyNmQs", "s273_wittmer", 3307);
-            else
-                dataServiceManager = new DataServiceManager("daemon-1.avadia.fr", "u273_MqKTNG9st6", "qRymrkh+x!6!OJNZtHLyNmQs", "s273_wittmer", 3306);
+            dataServiceManager = new DataServiceManager("pterodactyl.home", "u3_wqC0SILRvd", "!aGDZc.YRy!YWFdIjI67lqHj", "s3_wittmer", 3306);
             logger.info("Connecté !");
         } catch (Exception e) {
             logger.error("Erreur de connexion à la base de données", e);
@@ -110,18 +109,18 @@ public class Main {
         logger.info("Processus de vérification des membres...");
         Guild guild = jda.getGuildById(GUILD_ID);
         Category verifCategory = Objects.requireNonNull(guild).getCategoryById(VERIF_CATEGORY_ID);
-        for (GuildChannel guildChannel : Objects.requireNonNull(verifCategory).getChannels()) {
-            logger.info("Delete " + guildChannel.getName() + " verif channel...");
-            guildChannel.delete().queue();
+        for (GuildChannel deprecatedVerifChannel : Objects.requireNonNull(verifCategory).getChannels()) {
+            logger.info("Delete " + deprecatedVerifChannel.getName() + " verif channel...");
+            deprecatedVerifChannel.delete().queue();
         }
-        ChannelAction<TextChannel> channelAction1 = verifCategory.createTextChannel("\uD83C\uDD95 Demandes");
-        List<Permission> channelAllow1 = new ArrayList<>();
-        channelAllow1.add(Permission.MESSAGE_READ);
-        channelAllow1.add(Permission.VOICE_CONNECT);
-        channelAction1.addRolePermissionOverride(Role.DELEGUE.getRoleId(), channelAllow1, new ArrayList<>());
-        channelAction1.addRolePermissionOverride(Role.PROF.getRoleId(), channelAllow1, new ArrayList<>());
+        ChannelAction<TextChannel> demandesChannelAction = verifCategory.createTextChannel("\uD83C\uDD95 Demandes");
+        List<Permission> demandesChannelAllowPermissions = new ArrayList<>();
+        demandesChannelAllowPermissions.add(Permission.MESSAGE_READ);
+        demandesChannelAllowPermissions.add(Permission.VOICE_CONNECT);
+        demandesChannelAction.addRolePermissionOverride(Role.DELEGUE.getRoleId(), demandesChannelAllowPermissions, new ArrayList<>());
+        demandesChannelAction.addRolePermissionOverride(Role.PROF.getRoleId(), demandesChannelAllowPermissions, new ArrayList<>());
         logger.info("Create \uD83C\uDD95 Demandes verif channel...");
-        DEMANDES_CHANNEL_ID = channelAction1.complete().getIdLong();
+        DEMANDES_CHANNEL_ID = demandesChannelAction.complete().getIdLong();
         for (Member member : guild.getMembers()) {
             if (!production && member.getIdLong() != OWNER_ID)
                 continue;
@@ -139,7 +138,7 @@ public class Main {
                 try {
                     TextChannel textChannel = channelAction.complete();
                     if (dataServiceManager.isUserCreated(member.getIdLong())) {
-                        UserBean userBean = dataServiceManager.getUser(member.getIdLong(), new UserBean(member.getIdLong(), "", "", (short) 0, false, 0, "", false));
+                        UserBean userBean = dataServiceManager.getUser(member.getIdLong(), new UserBean(member.getIdLong(), "", "", 0L, false, 0, "", false));
                         Role role = Role.getById(userBean.getRole());
                         if (Objects.requireNonNull(role).equals(Role.PROF)) {
                             MenuVerifFinal.execute(member, textChannel, role, null, null, userBean.isDelegue(), userBean.getPrenom(), userBean.getNom());
@@ -153,43 +152,43 @@ public class Main {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            } else {
+                logger.info("Renaming " + member.getEffectiveName() + "...");
+                rename(member, member.getEffectiveName().split(" \\(")[0]);
             }
         }
-        Category commandsCategory = Objects.requireNonNull(guild).getCategoryById(COMMANDS_CATEGORY_ID);
-        for (GuildChannel guildChannel : Objects.requireNonNull(commandsCategory).getChannels()) {
-            logger.info("Delete " + guildChannel.getName() + " command channel...");
-            guildChannel.delete().queue();
+        Category actionsCategory = Objects.requireNonNull(guild).getCategoryById(ACTIONS_CATEGORY_ID);
+        for (GuildChannel deprecatedActionChannel : Objects.requireNonNull(actionsCategory).getChannels()) {
+            logger.info("Delete " + deprecatedActionChannel.getName() + " command channel...");
+            deprecatedActionChannel.delete().queue();
         }
-        for (Member member : guild.getMembers()) {
-            if (!production && member.getIdLong() != OWNER_ID)
-                continue;
-            try {
-                if (!dataServiceManager.isUserCreated(member.getIdLong()))
-                    continue;
-                UserBean userBean = dataServiceManager.getUser(member.getIdLong(), new UserBean(member.getIdLong(), "", "", (short) 0, false, 0, "", false));
-                if (userBean.isVerified()) {
-                    logger.info("Renaming " + member.getEffectiveName() + "...");
-                    if (member.getEffectiveName().contains(" ("))
-                        rename(member, member.getEffectiveName().split(" \\(")[0]);
-                    else
-                        rename(member, member.getEffectiveName());
-                    logger.info("Sending commands to " + member.getEffectiveName() + "...");
-                    ChannelAction<TextChannel> channelAction = commandsCategory.createTextChannel(member.getUser().getName());
-                    List<Permission> channelAllow = new ArrayList<>();
-                    channelAllow.add(Permission.MESSAGE_READ);
-                    channelAllow.add(Permission.VOICE_CONNECT);
-                    channelAllow.add(Permission.MESSAGE_ADD_REACTION);
-                    channelAllow.add(Permission.MESSAGE_WRITE);
-                    channelAllow.add(Permission.MESSAGE_EXT_EMOJI);
-                    channelAllow.add(Permission.MESSAGE_HISTORY);
-                    channelAction.addMemberPermissionOverride(member.getIdLong(), channelAllow, new ArrayList<>());
-                    TextChannel textChannel = channelAction.complete();
-                    MenuCommandStart.execute(member, textChannel);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+
+        ChannelAction<TextChannel> createActionsEleveChannelAction = actionsCategory.createTextChannel("Actions élèves");
+        List<Permission> createActionsEleveChannelAllowPermissions = new ArrayList<>();
+        createActionsEleveChannelAllowPermissions.add(Permission.MESSAGE_READ);
+        createActionsEleveChannelAllowPermissions.add(Permission.VOICE_CONNECT);
+        createActionsEleveChannelAllowPermissions.add(Permission.MESSAGE_ADD_REACTION);
+        createActionsEleveChannelAllowPermissions.add(Permission.MESSAGE_EXT_EMOJI);
+        createActionsEleveChannelAllowPermissions.add(Permission.MESSAGE_HISTORY);
+        createActionsEleveChannelAction.addRolePermissionOverride(Role.ELEVE.getRoleId(), createActionsEleveChannelAllowPermissions, new ArrayList<>());
+        logger.info("Create Actions élèves channel...");
+        TextChannel actionsEleveChannel = createActionsEleveChannelAction.complete();
+        ACTIONS_ELEVES_CHANNEL_ID = actionsEleveChannel.getIdLong();
+        MenuCommandStart.execute(actionsEleveChannel, Role.ELEVE);
+
+        ChannelAction<TextChannel> createActionsProfChannelAction = actionsCategory.createTextChannel("Actions profs");
+        List<Permission> createActionsProfChannelAllowPermissions = new ArrayList<>();
+        createActionsProfChannelAllowPermissions.add(Permission.MESSAGE_READ);
+        createActionsProfChannelAllowPermissions.add(Permission.VOICE_CONNECT);
+        createActionsProfChannelAllowPermissions.add(Permission.MESSAGE_ADD_REACTION);
+        createActionsProfChannelAllowPermissions.add(Permission.MESSAGE_EXT_EMOJI);
+        createActionsProfChannelAllowPermissions.add(Permission.MESSAGE_HISTORY);
+        createActionsProfChannelAction.addRolePermissionOverride(Role.PROF.getRoleId(), createActionsProfChannelAllowPermissions, new ArrayList<>());
+        logger.info("Create Actions profs channel...");
+        TextChannel actionsProfChannel = createActionsProfChannelAction.complete();
+        ACTIONS_PROFS_CHANNEL_ID = actionsProfChannel.getIdLong();
+        MenuCommandStart.execute(actionsProfChannel, Role.PROF);
+
         logger.info("OK");
 
         jda.getPresence().setStatus(OnlineStatus.ONLINE);
@@ -218,7 +217,7 @@ public class Main {
     @SuppressWarnings("StringBufferReplaceableByString")
     public static void joinClasse(Member member, ClasseBean classeBean) {
         try {
-            UserBean userBean = dataServiceManager.getUser(member.getIdLong(), new UserBean(member.getIdLong(), "", "", (short) 0, false, 0, "", false));
+            UserBean userBean = dataServiceManager.getUser(member.getIdLong(), new UserBean(member.getIdLong(), "", "", 0L, false, 0, "", false));
             Objects.requireNonNull(jda.getGuildById(GUILD_ID)).addRoleToMember(member, Objects.requireNonNull(jda.getRoleById(Objects.requireNonNull(classeBean).getDiscord_role_id()))).queue();
             StringBuilder pseudo = new StringBuilder();
             pseudo.append(userBean.getPrenom().toUpperCase(), 0, 1)
@@ -241,7 +240,7 @@ public class Main {
     public static void rename(Member member, String newPseudo) {
         try {
             if (dataServiceManager.isUserCreated(member.getIdLong())) {
-                UserBean userBean = dataServiceManager.getUser(member.getIdLong(), new UserBean(member.getIdLong(), "", "", (short) 0, false, 0, "", false));
+                UserBean userBean = dataServiceManager.getUser(member.getIdLong(), new UserBean(member.getIdLong(), "", "", 0L, false, 0, "", false));
                 StringBuilder pseudo = new StringBuilder();
                 pseudo.append(userBean.getPrenom().toUpperCase(), 0, 1)
                         .append(userBean.getPrenom(), 1, userBean.getPrenom().length())
@@ -267,5 +266,31 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static void allowActions(Member member, Role role) {
+        List<Permission> perm = new ArrayList<>();
+        perm.add(Permission.VIEW_CHANNEL);
+        perm.add(Permission.MESSAGE_ADD_REACTION);
+        perm.add(Permission.MESSAGE_READ);
+        TextChannel channel;
+        if (role.equals(Role.PROF))
+            channel = jda.getTextChannelById(ACTIONS_PROFS_CHANNEL_ID);
+        else
+            channel = jda.getTextChannelById(ACTIONS_ELEVES_CHANNEL_ID);
+        Objects.requireNonNull(channel).getManager().putPermissionOverride(member, perm, new ArrayList<>()).complete();
+    }
+
+    public static void disallow(Member member, Role role) {
+        List<Permission> perm = new ArrayList<>();
+        perm.add(Permission.VIEW_CHANNEL);
+        perm.add(Permission.MESSAGE_ADD_REACTION);
+        perm.add(Permission.MESSAGE_READ);
+        TextChannel channel;
+        if (role.equals(Role.PROF))
+            channel = jda.getTextChannelById(ACTIONS_PROFS_CHANNEL_ID);
+        else
+            channel = jda.getTextChannelById(ACTIONS_ELEVES_CHANNEL_ID);
+        Objects.requireNonNull(channel).getManager().putPermissionOverride(member, new ArrayList<>(), perm).complete();
     }
 }

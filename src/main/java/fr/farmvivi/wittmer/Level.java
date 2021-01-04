@@ -1,28 +1,28 @@
 package fr.farmvivi.wittmer;
 
 public enum Level {
-    SECONDE((short) 1, "S", "Seconde"),
-    PREMIERE((short) 2, "P", "Première"),
-    TERMINALE((short) 3, "T", "Terminale");
+    SECONDE(1L, "S", "Seconde"),
+    PREMIERE(2L, "P", "Première"),
+    TERMINALE(3L, "T", "Terminale");
 
-    private final short id;
+    private final long id;
     private final String prefix;
     private final String name;
 
-    Level(short id, String prefix, String name) {
+    Level(long id, String prefix, String name) {
         this.id = id;
         this.prefix = prefix;
         this.name = name;
     }
 
-    public static Level getById(short id) {
+    public static Level getById(long id) {
         for (Level level : values())
             if (level.getId() == id)
                 return level;
         return null;
     }
 
-    public short getId() {
+    public long getId() {
         return id;
     }
 

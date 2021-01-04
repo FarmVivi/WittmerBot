@@ -37,9 +37,9 @@ public class CreateClasseCommand extends Command {
             if (args.length < 4) {
                 event.replyWarning("Erreur arguments");
             } else {
-                Level level = Level.getById(Short.parseShort(args[0]));
-                Matiere matiere = Matiere.getById(Integer.parseInt(args[1]));
-                int num = Integer.parseInt(args[2]);
+                Level level = Level.getById(Long.parseLong(args[0]));
+                Matiere matiere = Matiere.getById(Long.parseLong(args[1]));
+                long num = Long.parseLong(args[2]);
                 long prof_id = Long.parseLong(args[3]);
                 StringBuilder name = new StringBuilder("⌈" + Objects.requireNonNull(matiere).getEmoji() + "⌋ " + Objects.requireNonNull(level).getPrefix());
                 if (Objects.requireNonNull(matiere).getName().isEmpty()) {

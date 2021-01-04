@@ -3,6 +3,7 @@ package fr.farmvivi.wittmer.menu.command;
 import com.jagrosh.jdautilities.menu.OrderedMenu;
 import fr.farmvivi.wittmer.Level;
 import fr.farmvivi.wittmer.Main;
+import fr.farmvivi.wittmer.Role;
 import fr.farmvivi.wittmer.persistanceapi.beans.users.ClasseBean;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -35,23 +36,21 @@ public class MenuCommandProfCreateChannelAskClasse {
                     channelAction.addMemberPermissionOverride(member.getIdLong(), channelAllow, new ArrayList<>());
                     channelAction.setUserlimit(99);
                     channelAction.queue();
-                    textChannel.sendMessage(new EmbedBuilder().setDescription("Salon crée !").setColor(Color.GREEN).build()).delay(5, TimeUnit.SECONDS).flatMap(message1 -> {
-                        message1.delete().queue();
-                        MenuCommandStart.execute(member, textChannel);
-                        return null;
-                    }).queue();
+                    textChannel.sendMessage(new EmbedBuilder().setDescription("Salon crée !").setColor(Color.GREEN).build())
+                            .delay(5, TimeUnit.SECONDS)
+                            .flatMap(Message::delete)
+                            .queue();
+                    MenuCommandSucess.execute(member, textChannel, Role.PROF);
                 });
         int i = 0;
         try {
             List<ClasseBean> classeBeans = Main.dataServiceManager.getClasseOfAProf(member.getIdLong(), level);
             if (classeBeans.isEmpty()) {
                 textChannel.sendMessage(Main.commandClient.getError() + " ERREUR: Aucune classe d'enregistré en " + level.getName())
-                        .delay(5, TimeUnit.SECONDS)
-                        .flatMap(message -> {
-                            message.delete().queue();
-                            MenuCommandStart.execute(member, textChannel);
-                            return null;
-                        }).queue();
+                        .delay(30, TimeUnit.SECONDS)
+                        .flatMap(Message::delete)
+                        .queue();
+                MenuCommandFailure.execute(member, textChannel, Role.PROF);
                 return;
             } else {
                 for (ClasseBean classeBean : classeBeans) {

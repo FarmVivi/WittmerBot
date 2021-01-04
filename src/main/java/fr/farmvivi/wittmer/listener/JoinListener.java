@@ -41,7 +41,7 @@ public class JoinListener extends ListenerAdapter {
         try {
             TextChannel textChannel = channelAction.complete();
             if (Main.dataServiceManager.isUserCreated(member.getIdLong())) {
-                UserBean userBean = Main.dataServiceManager.getUser(member.getIdLong(), new UserBean(member.getIdLong(), "", "", (short) 0, false, 0, "", false));
+                UserBean userBean = Main.dataServiceManager.getUser(member.getIdLong(), new UserBean(member.getIdLong(), "", "", 0L, false, 0, "", false));
                 Role role = Role.getById(userBean.getRole());
                 if (Objects.requireNonNull(role).equals(Role.PROF)) {
                     MenuVerifFinal.execute(member, textChannel, role, null, null, userBean.isDelegue(), userBean.getPrenom(), userBean.getNom());

@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameE
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class RenameListener extends ListenerAdapter {
-    public void onGuildMemberJoin(GuildMemberUpdateNicknameEvent event) {
+    public void onGuildMemberChangeNickname(GuildMemberUpdateNicknameEvent event) {
         Main.rename(event.getMember(), event.getNewNickname());
     }
 }

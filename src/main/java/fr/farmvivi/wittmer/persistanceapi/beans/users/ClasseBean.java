@@ -20,7 +20,7 @@ import fr.farmvivi.wittmer.Matiere;
  * along with PersistanceAPI.  If not, see <http://www.gnu.org/licenses/>.
  */
 public class ClasseBean {
-    private int id;
+    private long id;
     private Level level;
     private Matiere matiere;
     private String name;
@@ -33,7 +33,7 @@ public class ClasseBean {
         super();
     }
 
-    public ClasseBean(int id, Level level, Matiere matiere, String name, long discord_category_id, long discord_role_id, long discord_default_channel_id, long discord_prof_id) {
+    public ClasseBean(long id, Level level, Matiere matiere, String name, long discord_category_id, long discord_role_id, long discord_default_channel_id, long discord_prof_id) {
         this.id = id;
         this.level = level;
         this.matiere = matiere;
@@ -51,11 +51,11 @@ public class ClasseBean {
                 '}';
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

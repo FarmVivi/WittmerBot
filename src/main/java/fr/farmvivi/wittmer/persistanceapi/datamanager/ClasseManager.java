@@ -47,7 +47,7 @@ public class ClasseManager {
             String sql = "select id, level, matiere_id, name, category_id, role_id, default_channel_id, prof_id from classes where id = ?";
 
             statement = connection.prepareStatement(sql);
-            statement.setInt(1, user.getDefault_classe());
+            statement.setLong(1, user.getDefault_classe());
 
             // Execute the query
             resultset = statement.executeQuery();
@@ -55,9 +55,9 @@ public class ClasseManager {
             // Manage the result in a bean
             if (resultset.next()) {
                 // There's a result
-                int id = resultset.getInt("id");
-                short level = resultset.getShort("level");
-                int matiere_id = resultset.getInt("matiere_id");
+                long id = resultset.getLong("id");
+                long level = resultset.getLong("level");
+                long matiere_id = resultset.getLong("matiere_id");
                 String name = resultset.getString("name");
                 long category_id = resultset.getLong("category_id");
                 long role_id = resultset.getLong("role_id");
@@ -92,7 +92,7 @@ public class ClasseManager {
                     String sql = "select id, level, matiere_id, name, category_id, role_id, default_channel_id, prof_id from classes where id = ?";
 
                     statement = connection.prepareStatement(sql);
-                    statement.setInt(1, Integer.parseInt(classeIdName));
+                    statement.setLong(1, Long.parseLong(classeIdName));
 
                     // Execute the query
                     resultset = statement.executeQuery();
@@ -100,9 +100,9 @@ public class ClasseManager {
                     // Manage the result in a bean
                     if (resultset.next()) {
                         // There's a result
-                        int id = resultset.getInt("id");
-                        short level = resultset.getShort("level");
-                        int matiere_id = resultset.getInt("matiere_id");
+                        long id = resultset.getLong("id");
+                        long level = resultset.getLong("level");
+                        long matiere_id = resultset.getLong("matiere_id");
                         String name = resultset.getString("name");
                         long category_id = resultset.getLong("category_id");
                         long role_id = resultset.getLong("role_id");
@@ -154,9 +154,9 @@ public class ClasseManager {
             // Manage the result in a bean
             if (resultset.next()) {
                 // There's a result
-                int id = resultset.getInt("id");
-                short level = resultset.getShort("level");
-                int matiere_id = resultset.getInt("matiere_id");
+                long id = resultset.getLong("id");
+                long level = resultset.getLong("level");
+                long matiere_id = resultset.getLong("matiere_id");
                 String name = resultset.getString("name");
                 long CATEGORY_ID = resultset.getLong("category_id");
                 long role_id = resultset.getLong("role_id");
@@ -195,9 +195,9 @@ public class ClasseManager {
 
             // Manage the result in a list of bean
             while (resultset.next()) {
-                int id = resultset.getInt("id");
-                short level = resultset.getShort("level");
-                int matiere_id = resultset.getInt("matiere_id");
+                long id = resultset.getLong("id");
+                long level = resultset.getLong("level");
+                long matiere_id = resultset.getLong("matiere_id");
                 String name = resultset.getString("name");
                 long category_id = resultset.getLong("category_id");
                 long role_id = resultset.getLong("role_id");
@@ -229,16 +229,16 @@ public class ClasseManager {
 
             statement = connection.prepareStatement(sql);
             statement.setLong(1, prof_id);
-            statement.setShort(2, level.getId());
+            statement.setLong(2, level.getId());
 
             // Execute the query
             resultset = statement.executeQuery();
 
             // Manage the result in a list of bean
             while (resultset.next()) {
-                int id = resultset.getInt("id");
-                short LEVEL = resultset.getShort("level");
-                int matiere_id = resultset.getInt("matiere_id");
+                long id = resultset.getLong("id");
+                long LEVEL = resultset.getLong("level");
+                long matiere_id = resultset.getLong("matiere_id");
                 String name = resultset.getString("name");
                 long category_id = resultset.getLong("category_id");
                 long role_id = resultset.getLong("role_id");
@@ -269,16 +269,16 @@ public class ClasseManager {
             sql += " from classes where level = ?";
 
             statement = connection.prepareStatement(sql);
-            statement.setShort(1, level.getId());
+            statement.setLong(1, level.getId());
 
             // Execute the query
             resultset = statement.executeQuery();
 
             // Manage the result in a list of bean
             while (resultset.next()) {
-                int id = resultset.getInt("id");
-                short LEVEL = resultset.getShort("level");
-                int matiere_id = resultset.getInt("matiere_id");
+                long id = resultset.getLong("id");
+                long LEVEL = resultset.getLong("level");
+                long matiere_id = resultset.getLong("matiere_id");
                 String name = resultset.getString("name");
                 long category_id = resultset.getLong("category_id");
                 long role_id = resultset.getLong("role_id");
@@ -309,17 +309,17 @@ public class ClasseManager {
             sql += " from classes where level = ? and matiere_id = ?";
 
             statement = connection.prepareStatement(sql);
-            statement.setShort(1, level.getId());
-            statement.setInt(2, matiere.getId());
+            statement.setLong(1, level.getId());
+            statement.setLong(2, matiere.getId());
 
             // Execute the query
             resultset = statement.executeQuery();
 
             // Manage the result in a list of bean
             while (resultset.next()) {
-                int id = resultset.getInt("id");
-                short LEVEL = resultset.getShort("level");
-                int matiere_id = resultset.getInt("matiere_id");
+                long id = resultset.getLong("id");
+                long LEVEL = resultset.getLong("level");
+                long matiere_id = resultset.getLong("matiere_id");
                 String name = resultset.getString("name");
                 long category_id = resultset.getLong("category_id");
                 long role_id = resultset.getLong("role_id");
@@ -350,8 +350,8 @@ public class ClasseManager {
             sql += " values (?, ?, ?, ?, ?, ?, ?)";
 
             statement = connection.prepareStatement(sql);
-            statement.setShort(1, classe.getLevel().getId());
-            statement.setInt(2, classe.getMatiere().getId());
+            statement.setLong(1, classe.getLevel().getId());
+            statement.setLong(2, classe.getMatiere().getId());
             statement.setString(3, classe.getName());
             statement.setLong(4, classe.getDiscord_category_id());
             statement.setLong(5, classe.getDiscord_role_id());

@@ -20,9 +20,9 @@ public class UserBean {
     private long discord_id;
     private String prenom;
     private String nom;
-    private short role;
+    private long role;
     private boolean delegue;
-    private int default_classe;
+    private long default_classe;
     private String classes;
     private boolean verified;
 
@@ -30,7 +30,7 @@ public class UserBean {
         super();
     }
 
-    public UserBean(long discord_id, String prenom, String nom, short role, boolean delegue, int default_classe, String classes, boolean verified) {
+    public UserBean(long discord_id, String prenom, String nom, long role, boolean delegue, long default_classe, String classes, boolean verified) {
         this.discord_id = discord_id;
         this.prenom = prenom;
         this.nom = nom;
@@ -72,11 +72,11 @@ public class UserBean {
         this.nom = nom;
     }
 
-    public short getRole() {
+    public long getRole() {
         return role;
     }
 
-    public void setRole(short role) {
+    public void setRole(long role) {
         this.role = role;
     }
 
@@ -88,11 +88,11 @@ public class UserBean {
         this.delegue = delegue;
     }
 
-    public int getDefault_classe() {
+    public long getDefault_classe() {
         return default_classe;
     }
 
-    public void setDefault_classe(int default_classe) {
+    public void setDefault_classe(long default_classe) {
         this.default_classe = default_classe;
     }
 

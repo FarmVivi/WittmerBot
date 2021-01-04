@@ -4,6 +4,7 @@ import com.jagrosh.jdautilities.menu.SelectionDialog;
 import fr.farmvivi.wittmer.Level;
 import fr.farmvivi.wittmer.Main;
 import fr.farmvivi.wittmer.Matiere;
+import fr.farmvivi.wittmer.Role;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 
@@ -34,7 +35,7 @@ public class MenuCommandProfCreateClasseAskMatiere {
                     })
                     .setCanceled(message -> {
                         message.delete().queue();
-                        MenuCommandStart.execute(member, textChannel);
+                        MenuCommandFailure.execute(member, textChannel, Role.PROF);
                     });
             int i = 0;
             try {

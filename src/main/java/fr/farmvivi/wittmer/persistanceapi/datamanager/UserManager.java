@@ -51,13 +51,13 @@ public class UserManager {
                 long userDiscord_id = resultset.getLong("discord_id");
                 String prenom = resultset.getString("prenom");
                 String nom = resultset.getString("nom");
-                short role = resultset.getShort("role");
-                short delegueTemp = resultset.getShort("delegue");
-                boolean delegue = delegueTemp == (short) 1;
-                int default_classe = resultset.getInt("default_classe");
+                long role = resultset.getLong("role");
+                long delegueTemp = resultset.getLong("delegue");
+                boolean delegue = delegueTemp == 1L;
+                long default_classe = resultset.getLong("default_classe");
                 String classes = resultset.getString("classes");
-                short verifiedTemp = resultset.getShort("verified");
-                boolean verified = verifiedTemp == (short) 1;
+                long verifiedTemp = resultset.getLong("verified");
+                boolean verified = verifiedTemp == 1L;
                 user = new UserBean(userDiscord_id, prenom, nom, role, delegue, default_classe, classes, verified);
                 return user;
             } else {
@@ -91,21 +91,21 @@ public class UserManager {
             statement = connection.prepareStatement(sql);
             statement.setString(1, user.getPrenom());
             statement.setString(2, user.getNom());
-            statement.setShort(3, user.getRole());
-            short delegue;
+            statement.setLong(3, user.getRole());
+            long delegue;
             if (user.isDelegue())
-                delegue = (short) 1;
+                delegue = 1;
             else
-                delegue = (short) 0;
-            statement.setShort(4, delegue);
-            statement.setInt(5, user.getDefault_classe());
+                delegue = 0;
+            statement.setLong(4, delegue);
+            statement.setLong(5, user.getDefault_classe());
             statement.setString(6, user.getClasses());
-            short verified;
+            long verified;
             if (user.isVerified())
-                verified = (short) 1;
+                verified = 1;
             else
-                verified = (short) 0;
-            statement.setShort(7, verified);
+                verified = 0;
+            statement.setLong(7, verified);
             statement.setLong(8, user.getDiscord_id());
 
             // Execute the query
@@ -160,21 +160,21 @@ public class UserManager {
             statement.setLong(1, user.getDiscord_id());
             statement.setString(2, user.getPrenom());
             statement.setString(3, user.getNom());
-            statement.setShort(4, user.getRole());
-            short delegue;
+            statement.setLong(4, user.getRole());
+            long delegue;
             if (user.isDelegue())
-                delegue = (short) 1;
+                delegue = 1;
             else
-                delegue = (short) 0;
-            statement.setShort(5, delegue);
-            statement.setInt(6, user.getDefault_classe());
+                delegue = 0;
+            statement.setLong(5, delegue);
+            statement.setLong(6, user.getDefault_classe());
             statement.setString(7, user.getClasses());
-            short verified;
+            long verified;
             if (user.isVerified())
-                verified = (short) 1;
+                verified = 1;
             else
-                verified = (short) 0;
-            statement.setShort(8, verified);
+                verified = 0;
+            statement.setLong(8, verified);
 
             // Execute the query
             statement.executeUpdate();

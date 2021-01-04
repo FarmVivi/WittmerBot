@@ -4,8 +4,10 @@ import com.jagrosh.jdautilities.menu.OrderedMenu;
 import fr.farmvivi.wittmer.Level;
 import fr.farmvivi.wittmer.Main;
 import fr.farmvivi.wittmer.Matiere;
+import fr.farmvivi.wittmer.Role;
 import fr.farmvivi.wittmer.persistanceapi.beans.users.ClasseBean;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.util.HashMap;
@@ -32,12 +34,10 @@ public class MenuCommandProfCreateClasseAskClasse {
             List<ClasseBean> classeBeans = Main.dataServiceManager.getClassesListOfALevelAndMatiere(level, Matiere.AUCUNE);
             if (classeBeans.isEmpty()) {
                 textChannel.sendMessage(Main.commandClient.getError() + " ERREUR: Aucune classe d'enregistré en " + level.getName())
-                        .delay(5, TimeUnit.SECONDS)
-                        .flatMap(message -> {
-                            message.delete().queue();
-                            MenuCommandStart.execute(member, textChannel);
-                            return null;
-                        }).queue();
+                        .delay(30, TimeUnit.SECONDS)
+                        .flatMap(Message::delete)
+                        .queue();
+                MenuCommandFailure.execute(member, textChannel, Role.PROF);
                 return;
             } else {
                 for (ClasseBean classeBean : classeBeans) {

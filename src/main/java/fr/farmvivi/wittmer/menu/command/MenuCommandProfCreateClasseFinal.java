@@ -49,7 +49,7 @@ public class MenuCommandProfCreateClasseFinal {
             Main.dataServiceManager.createClasse(new ClasseBean(0, level, matiere, name.toString(), category.getIdLong(), role.getIdLong(), discussionTextChannel.getIdLong(), member.getIdLong()));
             ClasseBean classeBean = Main.dataServiceManager.getClasseOfACategory(category.getIdLong());
             Main.joinClasse(Objects.requireNonNull(Main.jda.getGuildById(Main.GUILD_ID)).getMemberById(classeBean.getDiscord_prof_id()), classeBean);
-            UserBean prof = Main.dataServiceManager.getUser(classeBean.getDiscord_prof_id(), new UserBean(member.getIdLong(), "", "", (short) 0, false, 0, "", false));
+            UserBean prof = Main.dataServiceManager.getUser(classeBean.getDiscord_prof_id(), new UserBean(member.getIdLong(), "", "", 0L, false, 0, "", false));
             StringBuilder text = new StringBuilder("<@&" + fr.farmvivi.wittmer.Role.ELEVE.getRoleId() + ">, ");
             text.append(prof.getPrenom().toUpperCase(), 0, 1)
                     .append(prof.getPrenom(), 1, prof.getPrenom().length());
@@ -68,6 +68,6 @@ public class MenuCommandProfCreateClasseFinal {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        MenuCommandStart.execute(member, textChannel);
+        MenuCommandSucess.execute(member, textChannel, fr.farmvivi.wittmer.Role.PROF);
     }
 }

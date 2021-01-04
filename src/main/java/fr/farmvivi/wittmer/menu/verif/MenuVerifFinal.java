@@ -4,17 +4,14 @@ import com.jagrosh.jdautilities.menu.OrderedMenu;
 import fr.farmvivi.wittmer.Level;
 import fr.farmvivi.wittmer.Main;
 import fr.farmvivi.wittmer.Role;
-import fr.farmvivi.wittmer.menu.command.MenuCommandStart;
 import fr.farmvivi.wittmer.persistanceapi.beans.users.ClasseBean;
 import fr.farmvivi.wittmer.persistanceapi.beans.users.UserBean;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.requests.restaction.ChannelAction;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -61,19 +58,6 @@ public class MenuVerifFinal {
                             messageVerif.getTextChannel().delete().queue();
                             Main.dataServiceManager.updateUser(userBean);
                             Main.rename(member, member.getEffectiveName());
-                            Guild guild = Main.jda.getGuildById(Main.GUILD_ID);
-                            Category commandsCategory = Objects.requireNonNull(guild).getCategoryById(Main.COMMANDS_CATEGORY_ID);
-                            ChannelAction<TextChannel> channelAction = Objects.requireNonNull(commandsCategory).createTextChannel(member.getUser().getName());
-                            List<Permission> channelAllow = new ArrayList<>();
-                            channelAllow.add(Permission.MESSAGE_READ);
-                            channelAllow.add(Permission.VOICE_CONNECT);
-                            channelAllow.add(Permission.MESSAGE_ADD_REACTION);
-                            channelAllow.add(Permission.MESSAGE_WRITE);
-                            channelAllow.add(Permission.MESSAGE_EXT_EMOJI);
-                            channelAllow.add(Permission.MESSAGE_HISTORY);
-                            channelAction.addMemberPermissionOverride(member.getIdLong(), channelAllow, new ArrayList<>());
-                            TextChannel cmdChannel = channelAction.complete();
-                            MenuCommandStart.execute(member, cmdChannel);
                             Main.logger.info("Accepted " + member.getEffectiveName());
                         } catch (Exception e) {
                             e.printStackTrace();
