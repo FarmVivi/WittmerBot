@@ -81,7 +81,10 @@ public class Main {
 
         logger.info("Connexion à la base de données...");
         try {
-            dataServiceManager = new DataServiceManager("pterodactyl.home", "u3_wqC0SILRvd", "!aGDZc.YRy!YWFdIjI67lqHj", "s3_wittmer", 3306);
+            if (production)
+                dataServiceManager = new DataServiceManager("172.17.0.1", "u3_wqC0SILRvd", "!aGDZc.YRy!YWFdIjI67lqHj", "s3_wittmer", 3306);
+            else
+                dataServiceManager = new DataServiceManager("pterodactyl.home", "u3_wqC0SILRvd", "!aGDZc.YRy!YWFdIjI67lqHj", "s3_wittmer", 3306);
             logger.info("Connecté !");
         } catch (Exception e) {
             logger.error("Erreur de connexion à la base de données", e);
